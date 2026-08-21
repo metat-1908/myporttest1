@@ -3,204 +3,243 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Portfolio — Live</title>
+<title>Stock Analyzer — พอร์ทของฉัน</title>
 <style>
   :root{
-    --bg:#0d0d12; --card:#16161f; --card2:#1c1c28; --line:#2a2a3a;
-    --tx:#f2f2f7; --mut:#9a9ab0; --accent:#7c5cff; --accent2:#a78bfa;
-    --green:#26c281; --red:#ff5c7a; --gold:#d9c26a; --blue:#5b9bff;
+    --bg:#0d0d12; --card:#16161f; --card2:#1c1c28; --card3:#22222f; --line:#2a2a3a;
+    --tx:#f2f2f7; --mut:#9a9ab0; --dim:#6a6a80;
+    --accent:#7c5cff; --accent2:#a78bfa;
+    /* status palette (fixed, icon+label always) */
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+    /* categorical (validated dark steps) */
+    --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c6:#008300; --c7:#9085e9;
+    --seq:#3987e5;
+    --up:#26c281; --down:#ff5c7a;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:14px;max-width:860px;margin:0 auto;-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:14px;max-width:880px;margin:0 auto;-webkit-font-smoothing:antialiased;line-height:1.5}
   h1{font-size:19px;font-weight:700}
   .sub{color:var(--mut);font-size:12px;margin-bottom:14px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
-  .hero{background:linear-gradient(145deg,#1e1a3a,#16161f);text-align:center;padding:20px 16px}
-  .hero .big{font-size:32px;font-weight:800;letter-spacing:-.5px}
-  .hero .baht{color:var(--mut);font-size:13px;margin-top:2px}
-  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-weight:700;font-size:14px;margin-top:8px}
-  .up{color:var(--green);background:rgba(38,194,129,.12)}
-  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 1.6s infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
   .sec-title{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-  .widget-box{height:520px}
-  .chart-box{height:420px}
-  .tv-note{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.5}
-  .row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
-  .row:last-child{margin-bottom:0}
-  .lbl{width:100px;font-size:13px;flex-shrink:0}
-  .bar-wrap{flex:1;background:var(--card2);border-radius:6px;height:22px;position:relative;overflow:hidden}
-  .bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
-  .val{width:52px;text-align:right;font-size:12px;font-weight:700;flex-shrink:0}
-  .cap-line{position:absolute;top:0;bottom:0;width:2px;background:var(--red);opacity:.8}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .stat{background:var(--card2);border-radius:12px;padding:12px}
-  .stat .k{font-size:11px;color:var(--mut)}
-  .stat .v{font-size:16px;font-weight:800;margin-top:3px}
-  .g{color:var(--green)} .r{color:var(--red)}
-  .action{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
-  .action:last-child{border-bottom:none}
-  .num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .action .t{font-size:13px;line-height:1.45}
-  .tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-left:4px}
-  .t-cut{background:rgba(255,92,122,.15);color:var(--red)}
-  .t-trim{background:rgba(217,194,106,.18);color:var(--gold)}
-  .t-hold{background:rgba(38,194,129,.15);color:var(--green)}
-  .legend{font-size:11.5px;color:var(--mut);line-height:1.7;margin-top:4px}
-  .muted{color:var(--mut)}
-  .disc{font-size:10.5px;color:var(--mut);line-height:1.6;text-align:center;margin-top:6px}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--up);margin-right:5px;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .muted{color:var(--mut)} .dim{color:var(--dim)}
+  .g{color:var(--up)} .r{color:var(--down)}
   a{color:var(--accent2)}
-  /* ---- form ---- */
-  .seg{display:flex;gap:8px;margin-bottom:12px}
-  .seg button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer}
-  .seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* ---------- analyzer ---------- */
+  .searchbar{display:flex;gap:8px;margin-bottom:10px}
+  .searchbar input{flex:1;background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--tx);padding:11px 12px;font-size:15px}
+  .searchbar input::placeholder{color:var(--dim)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;max-height:168px;overflow-y:auto;padding:2px}
+  .chip{background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+  .chip:hover{border-color:var(--accent)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .chip .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  /* verdict */
+  .vbadge{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px}
+  .v-good{background:rgba(12,163,12,.16);color:#3ec93e}
+  .v-warn{background:rgba(250,178,25,.15);color:var(--warn)}
+  .v-crit{background:rgba(208,59,59,.16);color:#f06a6a}
+  /* detail */
+  .dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .dtk{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .dnm{font-size:12.5px;color:var(--mut)}
+  .dpx{font-size:24px;font-weight:800;text-align:right}
+  .dchg{font-size:12.5px;font-weight:700;text-align:right}
+  /* gauge */
+  .gauge{margin:14px 0 6px}
+  .gtrack{position:relative;height:34px;background:var(--card3);border-radius:9px;margin:22px 0 26px}
+  .gband{position:absolute;top:0;bottom:0;background:rgba(57,135,229,.30);border-left:2px solid var(--c1);border-right:2px solid var(--c1)}
+  .gmark{position:absolute;top:-7px;bottom:-7px;width:3px;background:var(--tx);border-radius:2px}
+  .gmark.tgt{background:var(--c4);width:2px;top:-2px;bottom:-2px}
+  .glab{position:absolute;font-size:10.5px;font-weight:700;white-space:nowrap;transform:translateX(-50%)}
+  .glab.top{top:-20px} .glab.bot{bottom:-22px}
+  .gcap{display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}
+  .st{background:var(--card2);border-radius:9px;padding:8px 9px}
+  .st b{display:block;font-size:10px;color:var(--mut);font-weight:600;margin-bottom:2px}
+  .st span{font-size:13.5px;font-weight:700}
+  /* score pips */
+  .scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+  .sc{background:var(--card2);border-radius:10px;padding:10px}
+  .sc .lab{font-size:11px;color:var(--mut);font-weight:600;margin-bottom:6px;display:flex;justify-content:space-between}
+  .pips{display:flex;gap:3px}
+  .pip{height:9px;flex:1;border-radius:3px;background:var(--card3)}
+  .pip.on{background:var(--seq)}
+  .pip.pass{background:#3ec93e}
+  .pip.fail{background:#f06a6a}
+  /* plan */
+  .plan{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}
+  .pl{background:var(--card2);border-radius:9px;padding:9px 10px;font-size:12.5px}
+  .pl b{display:block;font-size:10px;color:var(--mut);font-weight:600;margin-bottom:2px}
+  .note{font-size:12.5px;line-height:1.6;background:var(--card2);border-radius:10px;padding:11px;margin-top:9px}
+  .note .nt{font-size:10.5px;color:var(--mut);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+  .srcline{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.7}
+  .mini{margin-top:11px}
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{text-align:left;color:var(--mut);font-weight:600;font-size:10.5px;padding:6px 4px;border-bottom:1px solid var(--line);text-transform:uppercase}
+  td{padding:8px 4px;border-bottom:1px solid var(--line)}
+  tr.clk{cursor:pointer}
+  tr.clk:hover td{background:var(--card2)}
+  .tw{overflow-x:auto}
+  /* forms */
   .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
   .fgrid.f3{grid-template-columns:1fr 1fr 1fr}
   .fld label{display:block;font-size:10.5px;color:var(--mut);margin-bottom:3px;font-weight:600}
   .fld input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--tx);padding:10px;font-size:14px}
-  .fld input::placeholder{color:#5c5c72}
-  #f_ticker{text-transform:uppercase}
+  .fld input::placeholder{color:var(--dim)}
+  #f_ticker,#c_tk{text-transform:uppercase}
   .btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:14.5px;width:100%;cursor:pointer}
   .btn.ghost{background:var(--card2);border:1px solid var(--line);color:var(--mut);font-size:12px;padding:9px}
   .btnrow{display:flex;gap:8px;margin-top:8px}
-  /* ---- item cards ---- */
+  .seg{display:flex;gap:8px;margin-bottom:12px}
+  .seg button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer}
+  .seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* items */
   .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card2)}
-  .item.brk{border-color:rgba(255,92,122,.55)}
+  .item.brk{border-color:rgba(208,59,59,.6)}
   .ihead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px}
   .ihead .tk{font-size:16px;font-weight:800}
   .isub{font-size:11.5px;color:var(--mut);margin-bottom:9px}
-  .lvls{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
-  .lvls.l3{grid-template-columns:1fr 1fr 1fr}
+  .lvls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:12px}
   .lv{background:var(--card);border-radius:8px;padding:7px 9px}
   .lv b{display:block;font-size:10px;color:var(--mut);font-weight:600;margin-bottom:1px}
   .alert{margin-top:8px;font-size:11.5px;font-weight:700;padding:7px 9px;border-radius:8px;line-height:1.5}
-  .a-red{background:rgba(255,92,122,.13);color:var(--red)}
-  .a-gold{background:rgba(217,194,106,.13);color:var(--gold)}
-  .a-green{background:rgba(38,194,129,.12);color:var(--green)}
-  .mini{margin-top:9px}
+  .a-crit{background:rgba(208,59,59,.14);color:#f06a6a}
+  .a-warn{background:rgba(250,178,25,.13);color:var(--warn)}
+  .a-good{background:rgba(12,163,12,.14);color:#3ec93e}
   .icons{display:flex;gap:6px;flex-shrink:0}
   .icons button{background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:7px;width:29px;height:27px;font-size:13px;cursor:pointer;line-height:1}
   .empty{color:var(--mut);font-size:12px;text-align:center;padding:16px 0;line-height:1.6}
-  .st{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
-  .s-go{background:rgba(38,194,129,.15);color:var(--green)}
-  .s-wait{background:rgba(217,194,106,.18);color:var(--gold)}
-  .s-no{background:rgba(255,92,122,.15);color:var(--red)}
-  .idea{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:11px;background:var(--card2)}
-  .idea h3{font-size:15px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .idea .px{font-size:12px;color:var(--mut);margin-bottom:7px}
-  .idea .news{font-size:12px;line-height:1.5;margin-bottom:9px}
-  .scorechip{font-size:10px;color:var(--mut);margin-bottom:8px}
-  @media(max-width:430px){.lbl{width:82px}.hero .big{font-size:28px}.widget-box{height:480px}.fgrid.f3{grid-template-columns:1fr 1fr}.lvls.l3{grid-template-columns:1fr 1fr}}
+  .widget-box{height:520px} .chart-box{height:420px}
+  .legend{font-size:11.5px;color:var(--mut);line-height:1.7;margin-top:4px}
+  .row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .lbl{width:100px;font-size:13px;flex-shrink:0}
+  .bar-wrap{flex:1;background:var(--card2);border-radius:6px;height:22px;position:relative;overflow:hidden}
+  .bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+  .val{width:52px;text-align:right;font-size:12px;font-weight:700}
+  .cap-line{position:absolute;top:0;bottom:0;width:2px;background:var(--crit)}
+  .action{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+  .action:last-child{border-bottom:none}
+  .num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .disc{font-size:10.5px;color:var(--mut);line-height:1.6;text-align:center;margin-top:6px}
+  .calcout{background:var(--card2);border-radius:10px;padding:12px;margin-top:10px;font-size:12.5px;line-height:1.7;display:none}
+  @media(max-width:430px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .lvls{grid-template-columns:1fr 1fr}
+    .fgrid.f3{grid-template-columns:1fr 1fr}
+    .lbl{width:80px}
+    .widget-box{height:470px}
+  }
 </style>
 </head>
 <body>
-  <h1>📊 พอร์ทของฉัน — Live</h1>
-  <div class="sub"><span class="live-dot"></span>ราคาสดจาก TradingView (อัปเดตเองตลอดเวลาที่เปิดหน้านี้) · ฐานพอร์ท 20 ส.ค. 2026</div>
+  <h1>📈 Stock Analyzer</h1>
+  <div class="sub"><span class="live-dot"></span>ราคาสดจาก TradingView · ฐานข้อมูลวิเคราะห์ 28 ตัว (วิจัย 21 ส.ค. 2026)</div>
 
   <div class="card" style="padding:6px">
     <div class="tradingview-widget-container">
       <div class="tradingview-widget-container__widget"></div>
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-      {"symbols":[
-        {"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},
-        {"proName":"NASDAQ:NVDA","title":"NVDA"},
-        {"proName":"NASDAQ:MU","title":"MU"},
-        {"proName":"NASDAQ:ASML","title":"ASML"},
-        {"proName":"NASDAQ:AMZN","title":"AMZN"},
-        {"proName":"NASDAQ:TSLA","title":"TSLA"},
-        {"proName":"NASDAQ:RKLB","title":"RKLB"},
-        {"proName":"AMEX:GLD","title":"GLD"}
-      ],"showSymbolLogo":true,"isTransparent":true,"displayMode":"adaptive","colorTheme":"dark","locale":"en"}
+      {"symbols":[{"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},{"proName":"NASDAQ:NVDA","title":"NVDA"},{"proName":"NASDAQ:MU","title":"MU"},{"proName":"NASDAQ:ASML","title":"ASML"},{"proName":"NASDAQ:GOOGL","title":"GOOGL"},{"proName":"NASDAQ:TSLA","title":"TSLA"},{"proName":"NASDAQ:RKLB","title":"RKLB"},{"proName":"AMEX:GLD","title":"GLD"}],"showSymbolLogo":true,"isTransparent":true,"displayMode":"adaptive","colorTheme":"dark","locale":"en"}
       </script>
     </div>
   </div>
 
-  <div class="card hero">
-    <div class="baht">มูลค่าสินทรัพย์ทั้งหมด (ฐาน 20 ส.ค. 2026)</div>
-    <div class="big">$1,543.61</div>
-    <div class="baht">≈ 50,630 บาท · หุ้น 74.25% · ETF 13.03% · ADR 12.72%</div>
-    <div class="pill up">↗ +17.42%</div>
-  </div>
-
-  <div class="grid2">
-    <div class="stat"><div class="k">🏆 ตัวนำ</div><div class="v g">ASML +126.6%</div><div class="muted">ADR · $196.35</div></div>
-    <div class="stat"><div class="k">⚠️ ตัวถ่วง</div><div class="v r">SPCX −39.8% · MP −20.8%</div><div class="muted">ทบทวน thesis</div></div>
-  </div>
-
-  <!-- ============ ADD / MANAGE ============ -->
   <div class="card">
-    <div class="sec-title">➕ เพิ่มหุ้นของฉัน (ไม่จำกัดจำนวน)</div>
-    <div class="seg">
-      <button id="segBuy" class="on">💼 ซื้อแล้ว</button>
-      <button id="segWatch">👀 แค่เฝ้าดู</button>
+    <div class="sec-title">🔍 เลือกหุ้นเพื่อดูราคาเหมาะสม + จุดเข้า/ออก</div>
+    <div class="searchbar"><input id="q" placeholder="พิมพ์ค้นหา เช่น NVDA, ชิป, ธนาคาร"></div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="card" id="detail"></div>
+
+  <div class="card">
+    <div class="sec-title">🏆 อันดับโอกาส (เรียงตามคะแนนรวม พื้นฐาน+เทคนิค)</div>
+    <div class="tw"><table id="rank">
+      <thead><tr><th>หุ้น</th><th>ราคา</th><th>VI</th><th>เทค</th><th>ราคาเหมาะสม</th><th>ส่วนต่าง</th><th>สัญญาณ</th></tr></thead>
+      <tbody></tbody></table></div>
+    <div class="legend">แตะแถวเพื่อดูรายละเอียด · “ส่วนต่าง” = ราคาเหมาะสม (ค่ากลาง) เทียบราคาปัจจุบัน — บวก = ยังมีช่องขึ้น, ลบ = ราคาแพงกว่ามูลค่าที่ประเมิน</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">🧮 คำนวณราคาเหมาะสมหุ้นตัวอื่น (นอกฐานข้อมูล)</div>
+    <div class="fgrid f3">
+      <div class="fld"><label>ชื่อย่อ</label><input id="c_tk" placeholder="เช่น CRWD"></div>
+      <div class="fld"><label>ราคาปัจจุบัน *</label><input id="c_px" type="number" step="any" placeholder="0.00"></div>
+      <div class="fld"><label>EPS ล่วงหน้า *</label><input id="c_eps" type="number" step="any" placeholder="เช่น 5.20"></div>
     </div>
+    <div class="fgrid f3">
+      <div class="fld"><label>รายได้โต %/ปี *</label><input id="c_gr" type="number" step="any" placeholder="เช่น 25"></div>
+      <div class="fld"><label>เป้านักวิเคราะห์</label><input id="c_tgt" type="number" step="any" placeholder="ถ้ามี"></div>
+      <div class="fld"><label>แนวรับ (สำหรับ stop)</label><input id="c_sup" type="number" step="any" placeholder="ถ้ามี"></div>
+    </div>
+    <button class="btn" id="c_go">คำนวณราคาเหมาะสม</button>
+    <div class="calcout" id="c_out"></div>
+    <div class="legend">หา EPS ล่วงหน้า/การเติบโต ได้ฟรีที่ <a href="https://stockanalysis.com" target="_blank" rel="noopener">stockanalysis.com</a> (ช่อง Forward EPS, Revenue Growth) · วิธีคิดใช้ P/E ที่เหมาะกับการเติบโต (แนว PEG) ไม่ใช่การทำนายอนาคต</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">➕ เพิ่มหุ้นของฉัน (ไม่จำกัด)</div>
+    <div class="seg"><button id="segBuy" class="on">💼 ซื้อแล้ว</button><button id="segWatch">👀 แค่เฝ้าดู</button></div>
     <div class="fgrid">
-      <div class="fld"><label>ชื่อย่อหุ้น *</label><input id="f_ticker" placeholder="NVDA หรือ NASDAQ:NVDA" maxlength="24"></div>
+      <div class="fld"><label>ชื่อย่อหุ้น *</label><input id="f_ticker" placeholder="NVDA" maxlength="24"></div>
       <div class="fld"><label id="lb_entry">ราคาที่ซื้อ *</label><input id="f_entry" type="number" step="any" placeholder="0.00"></div>
     </div>
     <div class="fgrid f3">
       <div class="fld" id="wrap_qty"><label>จำนวนหุ้น</label><input id="f_qty" type="number" step="any" placeholder="เช่น 5"></div>
-      <div class="fld"><label>ราคา Stop (ตัดขาดทุน)</label><input id="f_stop" type="number" step="any" placeholder="0.00"></div>
-      <div class="fld"><label>ราคาเป้าหมาย</label><input id="f_target" type="number" step="any" placeholder="0.00"></div>
+      <div class="fld"><label>Stop</label><input id="f_stop" type="number" step="any" placeholder="0.00"></div>
+      <div class="fld"><label>เป้าหมาย</label><input id="f_target" type="number" step="any" placeholder="0.00"></div>
     </div>
     <div class="fgrid">
-      <div class="fld"><label>ราคาปัจจุบัน (ใส่เองเพื่อคำนวณกำไร)</label><input id="f_cur" type="number" step="any" placeholder="ดูจากกราฟสด"></div>
-      <div class="fld"><label>โน้ต / เหตุผลที่เข้า</label><input id="f_note" placeholder="เช่น งบดี เบรกแนวต้าน" maxlength="80"></div>
+      <div class="fld"><label>ราคาปัจจุบัน (คำนวณกำไร)</label><input id="f_cur" type="number" step="any" placeholder="ดูจากกราฟสด"></div>
+      <div class="fld"><label>โน้ต</label><input id="f_note" placeholder="เหตุผลที่เข้า" maxlength="80"></div>
     </div>
     <button class="btn" id="btnSave">บันทึกเข้ารายการ</button>
     <div class="btnrow">
-      <button class="btn ghost" id="btnCancel" style="display:none">ยกเลิกการแก้ไข</button>
-      <button class="btn ghost" id="btnExport">📋 สำรองข้อมูล</button>
+      <button class="btn ghost" id="btnCancel" style="display:none">ยกเลิก</button>
+      <button class="btn ghost" id="btnExport">📋 สำรอง</button>
       <button class="btn ghost" id="btnImport">📥 กู้คืน</button>
     </div>
-    <div class="tv-note">ข้อมูลบันทึกในเบราว์เซอร์เครื่องนี้ (ไม่ส่งขึ้นเน็ต ไม่มีใครเห็น) · ใส่ Stop กับเป้า เพื่อให้ระบบคำนวณความเสี่ยง/ผลตอบแทนและเตือนเมื่อหลุด stop</div>
+    <div class="legend">บันทึกในเบราว์เซอร์เครื่องนี้เท่านั้น ไม่ส่งขึ้นเน็ต</div>
   </div>
 
   <div class="card">
     <div class="sec-title">⚙️ ตั้งค่าความเสี่ยง</div>
     <div class="fgrid">
       <div class="fld"><label>มูลค่าพอร์ตรวม (USD)</label><input id="s_port" type="number" step="any" value="1543.61"></div>
-      <div class="fld"><label>เสี่ยงต่อดีล (% ของพอร์ต)</label><input id="s_risk" type="number" step="any" value="1.5"></div>
+      <div class="fld"><label>เสี่ยงต่อดีล (%)</label><input id="s_risk" type="number" step="any" value="1.5"></div>
     </div>
-    <div class="legend">ใช้คำนวณ “จำนวนหุ้นที่ควรซื้อ” = (พอร์ต × %เสี่ยง) ÷ (ราคาเข้า − stop) ตามกฎในคู่มือ</div>
+    <div class="legend">ใช้คำนวณจำนวนหุ้น = (พอร์ต × %เสี่ยง) ÷ (ราคาเข้า − stop)</div>
   </div>
 
   <div class="card">
     <div class="sec-title">💼 หุ้นที่ซื้อแล้ว <span id="cntBuy" class="muted"></span></div>
     <div id="listBuy"></div>
-    <div id="emptyBuy" class="empty">ยังไม่มีรายการ — กรอกแบบฟอร์มด้านบน เลือก “💼 ซื้อแล้ว”<br>ระบบจะคำนวณกำไร/ขาดทุน ความเสี่ยง และเตือนเมื่อราคาหลุด stop</div>
+    <div id="emptyBuy" class="empty">ยังไม่มีรายการ — กรอกฟอร์มด้านบน เลือก “💼 ซื้อแล้ว”</div>
   </div>
 
   <div class="card">
     <div class="sec-title">👀 หุ้นที่เฝ้าดู <span id="cntWatch" class="muted"></span></div>
     <div id="listWatch"></div>
-    <div id="emptyWatch" class="empty">ยังไม่มีรายการ — กรอกแบบฟอร์มด้านบน เลือก “👀 แค่เฝ้าดู”<br>ระบบจะบอกโซนเข้า จำนวนหุ้นที่ควรซื้อ และ R:R ให้</div>
+    <div id="emptyWatch" class="empty">ยังไม่มีรายการ — กรอกฟอร์มด้านบน เลือก “👀 แค่เฝ้าดู”</div>
   </div>
 
-  <!-- ============ SYSTEM IDEAS ============ -->
   <div class="card">
-    <div class="sec-title">💡 แนะนำจากระบบ — เทคนิค + VI (ข้อมูล 19 ส.ค. 2026)</div>
-    <div id="ideas"></div>
-    <div class="tv-note">คะแนน VI (เต็ม 6) และเทคนิค (เต็ม 5) ประเมินตามเกณฑ์ในคู่มือ · ตัวเลขราคาเป็นระดับอ้างอิง ณ 19 ส.ค. ไม่ใช่คำสั่งซื้อ — ยืนยันกับกราฟสดก่อนเสมอ</div>
-  </div>
-
-  <!-- ============ LIVE WIDGETS ============ -->
-  <div class="card">
-    <div class="sec-title">🟢 ราคาสด — Watchlist พอร์ท ตามกลุ่ม</div>
+    <div class="sec-title">🟢 ราคาสด — Watchlist พอร์ท</div>
     <div class="widget-box">
       <div class="tradingview-widget-container" style="height:100%">
         <div class="tradingview-widget-container__widget" style="height:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
         {"colorTheme":"dark","dateRange":"3M","showChart":true,"locale":"en","width":"100%","height":"100%","isTransparent":true,"showSymbolLogo":true,"showFloatingTooltip":true,
         "tabs":[
-          {"title":"Tech","originalTitle":"Tech","symbols":[
-            {"s":"NASDAQ:MU","d":"Micron"},{"s":"NASDAQ:MSFT","d":"Microsoft"},{"s":"NASDAQ:SNPS","d":"Synopsys"},{"s":"NASDAQ:AAPL","d":"Apple"},{"s":"NASDAQ:NVDA","d":"Nvidia"},{"s":"NYSE:RBRK","d":"Rubrik"},{"s":"NYSE:CACI","d":"CACI"},{"s":"NASDAQ:ASML","d":"ASML"}]},
-          {"title":"Fin","originalTitle":"Fin","symbols":[
-            {"s":"NYSE:BAC","d":"Bank of America"},{"s":"NASDAQ:NDAQ","d":"Nasdaq"},{"s":"NYSE:SPGI","d":"S&P Global"},{"s":"NYSE:BRK.B","d":"Berkshire"},{"s":"NASDAQ:SOFI","d":"SoFi"}]},
-          {"title":"Ind","originalTitle":"Ind","symbols":[
-            {"s":"NASDAQ:RKLB","d":"Rocket Lab"},{"s":"NASDAQ:AVAV","d":"AeroVironment"},{"s":"NASDAQ:AAON","d":"AAON"},{"s":"NASDAQ:ESLT","d":"Elbit"},{"s":"NASDAQ:EOSE","d":"Eos"}]},
-          {"title":"อื่นๆ","originalTitle":"Other","symbols":[
-            {"s":"NASDAQ:AMZN","d":"Amazon"},{"s":"NASDAQ:TSLA","d":"Tesla"},{"s":"NYSE:MP","d":"MP Materials"},{"s":"NYSE:GEV","d":"GE Vernova"},{"s":"NYSE:DX","d":"Dynex"},{"s":"NYSE:O","d":"Realty Income"},{"s":"AMEX:GLD","d":"Gold ETF"},{"s":"NASDAQ:SGOV","d":"T-Bill ETF"}]}
+          {"title":"Tech","originalTitle":"Tech","symbols":[{"s":"NASDAQ:MU","d":"Micron"},{"s":"NASDAQ:MSFT","d":"Microsoft"},{"s":"NASDAQ:SNPS","d":"Synopsys"},{"s":"NASDAQ:AAPL","d":"Apple"},{"s":"NASDAQ:NVDA","d":"Nvidia"},{"s":"NYSE:RBRK","d":"Rubrik"},{"s":"NYSE:CACI","d":"CACI"},{"s":"NASDAQ:ASML","d":"ASML"}]},
+          {"title":"Fin","originalTitle":"Fin","symbols":[{"s":"NYSE:BAC","d":"Bank of America"},{"s":"NASDAQ:NDAQ","d":"Nasdaq"},{"s":"NYSE:SPGI","d":"S&P Global"},{"s":"NYSE:BRK.B","d":"Berkshire"},{"s":"NASDAQ:SOFI","d":"SoFi"}]},
+          {"title":"Ind","originalTitle":"Ind","symbols":[{"s":"NASDAQ:RKLB","d":"Rocket Lab"},{"s":"NASDAQ:AVAV","d":"AeroVironment"},{"s":"NASDAQ:AAON","d":"AAON"},{"s":"NASDAQ:ESLT","d":"Elbit"},{"s":"NASDAQ:EOSE","d":"Eos"}]},
+          {"title":"อื่นๆ","originalTitle":"Other","symbols":[{"s":"NASDAQ:AMZN","d":"Amazon"},{"s":"NASDAQ:TSLA","d":"Tesla"},{"s":"NYSE:MP","d":"MP Materials"},{"s":"NYSE:GEV","d":"GE Vernova"},{"s":"NYSE:DX","d":"Dynex"},{"s":"NYSE:O","d":"Realty Income"},{"s":"AMEX:GLD","d":"Gold ETF"},{"s":"NASDAQ:SGOV","d":"T-Bill ETF"}]}
         ]}
         </script>
       </div>
@@ -208,7 +247,7 @@
   </div>
 
   <div class="card">
-    <div class="sec-title">📈 กราฟสด (เปลี่ยนหุ้นได้ + มี EMA)</div>
+    <div class="sec-title">📊 กราฟสด (เปลี่ยนหุ้นได้)</div>
     <div class="chart-box">
       <div class="tradingview-widget-container" style="height:100%">
         <div class="tradingview-widget-container__widget" style="height:100%"></div>
@@ -220,212 +259,555 @@
   </div>
 
   <div class="card">
-    <div class="sec-title">สัดส่วนตามกลุ่ม (ในส่วนหุ้น · เพดาน 40%)</div>
+    <div class="sec-title">สัดส่วนพอร์ทตามกลุ่ม (เพดาน 40%)</div>
     <div id="sectors"></div>
-    <div class="legend">เส้นแดง = เพดาน 40% · <span class="r">Technology 44.9% เกินเพดาน</span> และถ้ารวม ASML (semis) ยิ่งกระจุกในธีมชิป/AI</div>
+    <div class="legend">เส้นแดง = เพดาน 40% · Technology 44.9% เกินเพดาน และเมื่อรวม ASML (ชิป) ยิ่งกระจุกในธีม AI</div>
   </div>
 
   <div class="card">
-    <div class="sec-title">แผนปรับพอร์ท (Rebalance)</div>
-    <div class="action"><div class="num">1</div><div class="t"><b>SPCX −39.8% · MP −20.8% · GEV −14.2%</b> <span class="tag t-cut">ทบทวน/CUT</span><br><span class="muted">ตัวขาดทุนหนัก เช็ก thesis ถ้าเสียแล้วตัดตามระบบ ไม่ถัวขาลง</span></div></div>
-    <div class="action"><div class="num">2</div><div class="t"><b>ASML +126% · RKLB +60% · GLD +55% · BAC +52%</b> <span class="tag t-trim">ล็อกกำไร</span><br><span class="muted">ASML โตจนเป็น 12.7% ของพอร์ท พิจารณาล็อกกำไรบางส่วน</span></div></div>
-    <div class="action"><div class="num">3</div><div class="t"><b>Tech + ASML</b> <span class="tag t-trim">ลดกระจุกชิป/AI</span><br><span class="muted">คุมไม่ให้ธีมเดียวหนักเกินไป กระจายความเสี่ยง</span></div></div>
-    <div class="action"><div class="num">4</div><div class="t"><b>เงินสด/SGOV</b> <span class="tag t-hold">กันไว้ 10–15%</span><br><span class="muted">รอ setup ใหม่ + จับตา Fed (กระทบ DX/O/GLD)</span></div></div>
+    <div class="sec-title">แผนปรับพอร์ท</div>
+    <div class="action"><div class="num">1</div><div class="t"><b>EOSE −82% จากจุดสูงสุด · SPCX · AVAV</b><br><span class="muted">ตัวที่ thesis เสียแล้ว ทบทวนจริงจัง ไม่ถัวขาลง</span></div></div>
+    <div class="action"><div class="num">2</div><div class="t"><b>ASML +126% (12.7% ของพอร์ท) · RKLB +60% · BAC +52%</b><br><span class="muted">ล็อกกำไรบางส่วน ลดความกระจุก เลื่อน stop ขึ้น</span></div></div>
+    <div class="action"><div class="num">3</div><div class="t"><b>MP กำลังฟื้น +8.2% เบรกแนวต้าน</b><br><span class="muted">จากที่ −20.8% ตอนนี้มี catalyst นโยบายแร่หายาก จับตาต่อ</span></div></div>
+    <div class="action"><div class="num">4</div><div class="t"><b>เงินสด/SGOV 10–15%</b><br><span class="muted">รอ setup ใหม่ · จับตา Fed (กระทบ DX ปันผล 15.6% และ O)</span></div></div>
   </div>
 
-  <div class="card">
-    <div class="sec-title">กติกาเข้าเร็ว (Quick Rules)</div>
-    <div class="legend">
-      <b>ก่อนซื้อ:</b> VI ≥ 4/6 · เทคนิค ≥ 3/5 · มี catalyst · ตั้ง stop เสี่ยง ≤ 1.5% ของพอร์ท<br>
-      <b>Gap:</b> ไม่ไล่ราคา gap ขึ้น &gt;15% ในวันเดียว · รอย่อ/ยืนเหนือ gap 1–2 วัน<br>
-      <b>ขาย:</b> หลุด stop = ขายทันที ไม่ถัวขาลง · ล็อกกำไรบางส่วนที่ +20–25%<br>
-      <b>สั้น vs ยาว:</b> สั้น=เล่นรอบตามเทคนิค/gap (stop แน่น) · ยาว=VI ถือข้ามรอบ ทบทวนทุกไตรมาส
-    </div>
-  </div>
-
-  <div class="card" style="background:var(--card2)">
-    <div class="sec-title">🔔 ระบบข่าวอัตโนมัติ</div>
-    <div class="legend">สแกนข่าว/งบ/เทรนด์ ทุกเช้าวันทำการ (≈07:00 น. ไทย) เน้นกลุ่ม Tech + แนะนำหุ้นพร้อมโซนเข้า/stop/เป้า ส่งเข้าแอป Claude บนมือถือ</div>
-  </div>
-
-  <div class="disc">⚠️ เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนเฉพาะบุคคล · ราคาจาก TradingView อาจดีเลย์ตามสิทธิ์ฟรี · ตรวจสอบข้อมูลล่าสุดก่อนตัดสินใจเสมอ</div>
+  <div class="disc">⚠️ เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนเฉพาะบุคคล ผู้จัดทำไม่ใช่ที่ปรึกษาการลงทุน<br>“ราคาเหมาะสม” เป็นการประมาณตามสูตร ไม่ใช่การทำนายอนาคต · ข้อมูลพื้นฐาน ณ 21 ส.ค. 2026 ราคาเปลี่ยนตลอดเวลา<br>ตรวจสอบกับแหล่งข้อมูลต้นทางและกราฟสดก่อนตัดสินใจทุกครั้ง</div>
 
 <script>
-/* ================= sector bars ================= */
-const sectors=[
-  {n:"Technology",v:44.93,c:"#7c5cff"},{n:"Financials",v:19.36,c:"#5b9bff"},
-  {n:"Industrials",v:14.62,c:"#d9c26a"},{n:"Real Estate",v:10.59,c:"#e26fa0"},
-  {n:"Cons. Disc.",v:7.18,c:"#4fc3a1"},{n:"Materials",v:2.85,c:"#c8803a"},{n:"Utilities",v:0.47,c:"#8a7dd6"}];
-const CAP=40,maxv=Math.max(...sectors.map(s=>s.v),CAP);
-const scEl=document.getElementById("sectors");
-sectors.forEach(s=>{const o=s.v>CAP;const d=document.createElement("div");d.className="row";
-  d.innerHTML=`<div class="lbl">${s.n}</div><div class="bar-wrap"><div class="bar" style="width:${(s.v/maxv*100).toFixed(1)}%;background:${s.c}">${s.v}%</div><div class="cap-line" style="left:${(CAP/maxv*100).toFixed(1)}%"></div></div><div class="val" style="color:${o?'var(--red)':'var(--tx)'}">${s.v}%</div>`;
-  scEl.appendChild(d);});
+/* ===== ฐานข้อมูลหุ้น — วิจัย 21 ส.ค. 2026 =====
+   px=ราคา, gr=รายได้โต%, tgt=เป้านักวิเคราะห์, na=จำนวนนักวิเคราะห์
+   vi=คะแนนพื้นฐาน/6, te=คะแนนเทคนิค/5, fl/fh=ช่วงราคาเหมาะสม  */
+const STOCKS=[
+{tk:"NVDA",epx:213.5,nm:"Nvidia",sec:"Semis",px:215.65,chg:-0.55,lo:164.07,hi:236.54,pe:33.21,fpe:21.65,eps:6.53,gr:70.7,tgt:304.73,na:62,rate:"Strong Buy",ms:null,
+ sup:[211.14,210.69],res:[218.66,219.51],vi:6,te:3,fl:250,fh:300,en:"211–216 (แนวรับ)",sl:205,t1:236,t2:260,earn:"26 ส.ค. 2026 (ยืนยันแล้ว)",
+ basis:"EPS ล่วงหน้า ~$9.96 × P/E 25–30 (โต 71%) · consensus $304.73",
+ news:"Vera Rubin เข้าสู่การผลิตเต็มรูปแบบ · ไตรมาสล่าสุดรายได้ $81.6B ดาต้าเซ็นเตอร์ +92% ตั้งมาตรฐานสูงก่อนงบ 26 ส.ค.",
+ sht:"⚠️ งบออก 26 ส.ค. = event risk สูง ถ้าเข้าก่อนงบควรไม้เล็ก หรือรอราคายืนหลังงบแล้วค่อยตาม",
+ lng:"พื้นฐานแกร่งสุดในกลุ่ม fwd P/E 21.7 เทียบการเติบโต 71% ถือว่าไม่แพง เหมาะเป็น Core ระยะยาว",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/nvda/"],["stockinvest","https://stockinvest.us/stock/NVDA"]]},
 
-/* ================= system ideas ================= */
-const ideas=[
- {tk:"PLTR",name:"Palantir",px:"$175.19 (+2.1%)",st:"🟢 เข้าเกณฑ์",cls:"s-go",vi:5,te:5,
-  news:"งบ Q2 beat · อยู่ในเทรนด์ขาขึ้นแข็ง แนวรับวอลุ่ม $172",
-  entry:"ย่อ $172 ไม่หลุด / เบรก >$179",stop:"$162 (−7.5%)",tgt:"$190 (+8–12%)",long:"Growth สูง แต่ valuation แพงมาก → เป็น Satellite ไซซ์เล็ก คุมความเสี่ยง"},
- {tk:"NVDA",name:"Nvidia",px:"$217.56",st:"🟡 รอผลงบ",cls:"s-wait",vi:6,te:3,
-  news:"ผู้นำชิป AI · ประกาศงบ ~26 ส.ค. (event risk สูง) ราคาแกว่งใกล้แนวรับวอลุ่ม $211",
-  entry:"$211–217 (แนวรับ)",stop:"$205 (−5.7%)",tgt:"$232 (+6–10%)",long:"พื้นฐานแกร่งสุดในกลุ่ม เหมาะเป็น Core ถือยาว · ก่อนงบควรไม้เล็ก หรือรอยืนหลังงบ"},
- {tk:"MU",name:"Micron (ถืออยู่)",px:"$937.11",st:"🟡 รอ base",cls:"s-wait",vi:5,te:2,
-  news:"HBM/AI memory sold-out (ธีมแข็ง) แต่เทรนด์สั้นย่อ · แนวต้าน $954/$1,048 แนวรับ $920",
-  entry:"เบรก >$955 ยืนได้ / รับ $920",stop:"$890 (−5%)",tgt:"$1,048 (+12%)",long:"Core ธีม memory supercycle · ผันผวนแรงมาก ต้องคุมไซซ์"},
- {tk:"AMD",name:"AMD",px:"$466.42 (−3.7%)",st:"🔴 รอ ยังลง",cls:"s-no",vi:4,te:1,
-  news:"เทคนิคเป็น Sell candidate เทรนด์สั้นลง · ยังไม่ควรเข้า รอฐานใหม่",
-  entry:"รอยืนเหนือ $482 + วอลุ่ม",stop:"$455",tgt:"$520 (หลังเบรก)",long:"พื้นฐานพอใช้ แต่เทคนิคไม่ผ่านเกณฑ์ → อยู่ watchlist ก่อน"},
- {tk:"AVGO",name:"Broadcom",px:"$362.48 (−4.6%)",st:"🔴 รอ ลงแรง",cls:"s-no",vi:5,te:1,
-  news:"−13% ใน 10 วัน · Strong Sell เทคนิค เทรนด์ลง · ห้ามรีบรับมีด",
-  entry:"รอยืนเหนือ $382",stop:"$348",tgt:"$400+ (หลังเสถียร)",long:"VI ดี (กระแสเงินสดแกร่ง) แต่ต้องรอจังหวะเทคนิคกลับตัว"}];
-const ideaBox=document.getElementById("ideas");
-ideas.forEach(i=>{const d=document.createElement("div");d.className="idea";
-  d.innerHTML=`<h3><span>${i.tk}</span><span class="st ${i.cls}">${i.st}</span></h3>
-    <div class="px">${i.name} · ${i.px}</div>
-    <div class="scorechip">VI <b style="color:${i.vi>=4?'var(--green)':'var(--gold)'}">${i.vi}/6</b> · เทคนิค <b style="color:${i.te>=3?'var(--green)':'var(--red)'}">${i.te}/5</b></div>
-    <div class="news">📰 ${i.news}</div>
-    <div class="lvls"><div class="lv"><b>โซนเข้า</b>${i.entry}</div><div class="lv"><b>Stop</b>${i.stop}</div>
-    <div class="lv"><b>เป้าสั้น</b>${i.tgt}</div><div class="lv"><b>มุมมองยาว</b>${i.long}</div></div>`;
-  ideaBox.appendChild(d);});
+{tk:"MU",epx:936,nm:"Micron",sec:"Semis",px:966.85,chg:-0.77,lo:114.25,hi:1255.00,pe:21.99,fpe:6.78,eps:44.31,gr:167.0,tgt:1501.98,na:46,rate:"Strong Buy",ms:null,
+ sup:[935.89,895.88],res:[1048.51,1132.33],vi:6,te:2,fl:1100,fh:1500,en:"รับ $936 / เบรก >$978 ยืนได้",sl:890,t1:1048,t2:1132,earn:"22 ก.ย. 2026",
+ basis:"EPS ล่วงหน้า ~$142 × P/E 8–12 (หุ้นวัฏจักร) · consensus $1,502",
+ news:"ขึ้น ~240% ตั้งแต่ต้นปีจากบูม AI memory · ล็อกคำสั่งซื้อขั้นต่ำสะสม ~$100B และ HBM ขายหมดแล้ว",
+ sht:"เทคนิคยังไม่กลับตัว ห่างจุดสูงสุด −23% รอยืนเหนือ $978 พร้อมวอลุ่มก่อน",
+ lng:"⚠️ หุ้นวัฏจักร (cyclical) — fwd P/E 6.8 ที่ดูถูกมากมักเกิดตอนกำไรพีค ระวังกับดัก ถือได้แต่ต้องคุมไซซ์",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/mu/"],["stockinvest","https://stockinvest.us/stock/MU"]]},
 
-/* ================= my stocks manager ================= */
+{tk:"ASML",epx:1700,nm:"ASML Holding",sec:"Semis",px:1751.52,chg:0.07,lo:716.20,hi:1999.96,pe:55.65,fpe:30.82,eps:31.41,gr:9.8,tgt:2195.39,na:44,rate:"Strong Buy",ms:null,
+ sup:[1655.26,1641.74],res:[1777.77,1815.27],vi:5,te:4,fl:1850,fh:2200,en:"ย่อ $1,655–1,755",sl:1600,t1:1900,t2:2000,earn:"14 ต.ค. 2026",
+ basis:"EPS ล่วงหน้า ~$56.8 × P/E 32–38 (ผูกขาด EUV) · consensus $2,195",
+ news:"ปรับเป้ายอดขายปี 2026 ขึ้นเป็น €43–45B · Intel Foundry เริ่มผลิตจำนวนมากด้วยเครื่อง High-NA EUV แล้ว backlog ทำสถิติ",
+ sht:"เทรนด์ขึ้นแข็ง ใกล้จุดสูงสุด รอย่อรับแถวแนวรับ $1,655 จะได้ราคาดีกว่าไล่",
+ lng:"ผูกขาดเครื่อง EUV โลก (moat แข็งสุดในพอร์ต) · ⚠️ คุณถืออยู่ 12.7% ของพอร์ตแล้ว พิจารณาล็อกกำไรบางส่วน",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/asml/"],["stockinvest","https://stockinvest.us/stock/ASML"]]},
+
+{tk:"AMD",epx:466,nm:"Advanced Micro Devices",sec:"Semis",px:469.19,chg:-0.06,lo:149.22,hi:584.73,pe:119.82,fpe:42.26,eps:3.90,gr:39.5,tgt:613.09,na:53,rate:"Strong Buy",ms:null,
+ sup:[466.38,454.62],res:[482.05,518.58],vi:5,te:2,fl:450,fh:560,en:"รับ $466 / เบรก >$482 + วอลุ่ม",sl:454,t1:518,t2:560,earn:"3 พ.ย. 2026",
+ basis:"EPS ล่วงหน้า ~$11.1 × P/E 40–50 (โต 40%) · consensus $613",
+ news:"ประกาศดีลหลายพันล้านกับ Anthropic (4 ส.ค.) ครอบคลุม GPU MI455X และระบบ Helios ทำให้นักวิเคราะห์แห่ปรับเป้าขึ้น",
+ sht:"ราคายืนบนแนวรับพอดี ยังไม่ทะลุ $482 รอสัญญาณยืนยันก่อน",
+ lng:"เบอร์ 2 ของตลาด AI GPU มีดีล Anthropic เป็น catalyst จริง แต่ fwd P/E 42 ไม่ถูก ราคาปัจจุบันอยู่กลางช่วงเหมาะสม",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/amd/"],["stockinvest","https://stockinvest.us/stock/AMD"]]},
+
+{tk:"AVGO",epx:382,nm:"Broadcom",sec:"Semis",px:367.58,chg:0.98,lo:286.17,hi:495.00,pe:60.58,fpe:23.07,eps:6.01,gr:32.3,tgt:526.30,na:49,rate:"Strong Buy",ms:320,
+ sup:[362.48,360.45],res:[382.07,385.73],vi:4,te:1,fl:320,fh:510,en:"รอยืนเหนือ $382",sl:348,t1:420,t2:460,earn:"2 ก.ย. 2026",
+ basis:"Morningstar $320 vs consensus $526 — ต่างกันมาก · EPS ล่วงหน้า ~$15.9 × P/E 25–32",
+ news:"มีรายงานเจรจาแพ็กเกจหนี้ ~$100B กับ Blackstone และ Apollo เพื่อขยายธุรกิจชิป AI",
+ sht:"🔴 ลง −13% ใน 10 วัน เทรนด์ลงชัด ห้ามรีบรับมีด รอฐานใหม่",
+ lng:"⚠️ Morningstar ประเมินมูลค่าที่ $320 = ต่ำกว่าราคาปัจจุบัน (แพงไป) สวนทางนักวิเคราะห์ทั่วไป + กำลังก่อหนี้ก้อนใหญ่",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/avgo/"],["Morningstar","https://www.morningstar.com/stocks/xnas/avgo/quote"]]},
+
+{tk:"SNPS",epx:400,nm:"Synopsys",sec:"Semis",px:397.00,chg:-0.23,lo:366.00,hi:615.79,pe:94.25,fpe:25.07,eps:4.22,gr:39.5,tgt:560.17,na:24,rate:"Buy",ms:382,
+ sup:[384.28,378.46],res:[454.34,475.62],vi:4,te:1,fl:382,fh:500,en:"รอฐาน / ยืนเหนือ $400",sl:370,t1:454,t2:476,earn:"26 ส.ค. 2026",
+ basis:"Morningstar $382 ≈ ราคาปัจจุบัน (fairly valued) · consensus $560",
+ news:"ราคาใกล้จุดต่ำสุด 52 สัปดาห์ (−33% ใน 1 ปี) จากภาระหนี้ดีล Ansys, Design IP อ่อนแอ และการคุมส่งออกไปจีน · งบ Q3 ออก 26 ส.ค.",
+ sht:"🔴 เทคนิคยังลง แต่งบ 26 ส.ค. เป็น catalyst ที่พลิกได้ ถ้าจะเข้าให้รอราคายืนหลังงบ",
+ lng:"EDA เป็นธุรกิจ duopoly moat ดี Morningstar บอกราคาเหมาะสมแล้ว · คุณถืออยู่ ควรจับตางบใกล้ชิด",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/snps/"],["Morningstar","https://www.morningstar.com/stocks/xnas/snps/quote"]]},
+
+{tk:"MSFT",epx:470,nm:"Microsoft",sec:"Tech",px:483.93,chg:0.58,lo:349.20,hi:553.72,pe:26.81,fpe:24.39,eps:17.95,gr:17.8,tgt:569.56,na:56,rate:"Strong Buy",ms:null,
+ sup:[451.10,450.24],res:[487.65,492.81],vi:6,te:4,fl:515,fh:580,en:"$451–484",sl:445,t1:493,t2:553,earn:"~28 ต.ค. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$19.8 × P/E 26–30 · consensus $569.56",
+ news:"Azure ทำรายได้ทะลุ $100B ต่อปีเป็นครั้งแรก (รายงาน 29 ก.ค.) ทำให้ราคาพุ่ง ~15% ในวันเดียว",
+ sht:"ราคาชนแนวต้าน $487 ถ้าทะลุพร้อมวอลุ่มมีโอกาสไปต่อ · ย่อลงแนวรับ $451 คือจุดเข้าที่ดี",
+ lng:"คุณภาพสูงสุดกลุ่มหนึ่ง กระแสเงินสดแกร่ง AI monetize ได้จริง เหมาะเป็น Core ถือยาว",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/msft/"],["stockinvest","https://stockinvest.us/stock/MSFT"]]},
+
+{tk:"GOOGL",epx:339,nm:"Alphabet",sec:"Tech",px:340.67,chg:-1.17,lo:196.60,hi:408.61,pe:17.09,fpe:25.55,eps:19.93,gr:20.1,tgt:428.07,na:64,rate:"Strong Buy",ms:null,
+ sup:[337.39,319.74],res:[349.68,358.99],vi:6,te:4,fl:360,fh:428,en:"$337–341 (บนแนวรับ)",sl:318,t1:350,t2:409,earn:"~28 ต.ค. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$13.3 × P/E 27–32 (โต 20%) · consensus $428",
+ news:"ราคาขึ้น 5.1% เมื่อ 3 ส.ค. หลัง Morgan Stanley ยืนยันว่าแผนลงทุน AI $195–205B ยั่งยืนได้ด้วยกระแสเงินสดอิสระ $53.3B",
+ sht:"ยืนเหนือแนวรับ $337 เทรนด์ยังดี · หลุด $318 ค่อยทบทวน",
+ lng:"คุ้มค่าสุดในกลุ่ม mega-cap: fwd P/E 25.5 กับการเติบโต 20% + AI ลงทุนได้จากเงินสดตัวเอง ไม่ต้องกู้",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/googl/"],["stockinvest","https://stockinvest.us/stock/GOOGL"]]},
+
+{tk:"AMZN",epx:250,nm:"Amazon",sec:"Tech",px:259.00,chg:-0.43,lo:196.00,hi:287.20,pe:20.92,fpe:28.07,eps:12.44,gr:15.8,tgt:326.84,na:60,rate:"Strong Buy",ms:null,
+ sup:[240.14,235.50],res:[271.58,277.42],vi:6,te:3,fl:280,fh:325,en:"$240–259",sl:233,t1:271,t2:287,earn:"~29 ต.ค. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$9.2 × P/E 30–35 · consensus $326.84",
+ news:"มาร์เก็ตแคปแตะ $3 ล้านล้านช่วงต้น ส.ค. หลัง AWS โต 36.7% เร็วสุดใน 18 ไตรมาส ก่อนย่อลงจากข่าว Bezos ขายหุ้น $4B",
+ sht:"ย่อจากจุดสูง มีแนวรับ $240 · เข้าโซนนี้ได้ถ้ายังยืนเหนือ",
+ lng:"AWS กลับมาเร่งตัวคือหัวใจ · คุณถืออยู่ +33.6% พื้นฐานยังดี ถือต่อได้",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/amzn/"],["stockinvest","https://stockinvest.us/stock/AMZN"]]},
+
+{tk:"META",epx:543,nm:"Meta Platforms",sec:"Tech",px:552.36,chg:1.20,lo:520.26,hi:790.80,pe:20.57,fpe:17.04,eps:26.54,gr:27.7,tgt:754.14,na:62,rate:"Strong Buy",ms:null,
+ sup:[543.67,542.87],res:[593.00,612.91],vi:6,te:2,fl:620,fh:754,en:"ยืนเหนือ $543 ค่อยเข้า",sl:515,t1:593,t2:650,earn:"~28 ต.ค. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$32.4 × P/E 20–25 (หักส่วนลดความเสี่ยงคดี) · consensus $754",
+ news:"ราคาร่วงแรง 18 ส.ค. หลังเปิดการพิจารณาคดีความปลอดภัยเด็ก โดย 29 รัฐกล่าวหาว่าออกแบบแพลตฟอร์มให้เสพติดและเก็บข้อมูลเด็กต่ำกว่า 13 ปี",
+ sht:"gap ลงจากข่าวคดี = โอกาสถ้ารับความเสี่ยงได้ แต่ต้องรอราคายืนเหนือ $543 ก่อน อย่ารีบรับมีด",
+ lng:"⚠️ fwd P/E 17 กับการเติบโต 28% ถือว่าถูกผิดปกติ แต่ส่วนลดนี้มาจากความเสี่ยงคดีที่ยังไม่จบ = ความไม่แน่นอนจริง",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/meta/"],["Motley Fool","https://www.fool.com/investing/2026/08/18/why-meta-platforms-stock-crashed-today/"]]},
+
+{tk:"AAPL",epx:296,nm:"Apple",sec:"Tech",px:310.68,chg:-0.20,lo:223.78,hi:344.57,pe:35.71,fpe:33.99,eps:8.72,gr:14.2,tgt:326.34,na:45,rate:"Buy",ms:null,
+ sup:[308.91,283.78],res:[327.50,333.26],vi:5,te:3,fl:260,fh:326,en:"$284–309",sl:278,t1:327,t2:333,earn:"~29 ต.ค. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$9.1 × P/E 28–33 (โต 14%) · consensus $326",
+ news:"นักวิเคราะห์จับตา iPhone จอพับที่คาดเปิดตัว ก.ย. 2026 · Morgan Stanley มองบวกที่ราคา $1,500+ ขณะที่ BofA เตือนต้นทุนจอกดดันมาร์จิ้น",
+ sht:"อยู่บนแนวรับพอดี upside ถึงเป้านักวิเคราะห์เหลือแค่ ~5%",
+ lng:"⚠️ fwd P/E 34 เทียบการเติบโต 14% ถือว่าตึง ราคาปัจจุบันสูงกว่าค่ากลางที่ประเมินได้ — ถือได้แต่ไม่ใช่จังหวะเพิ่ม",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/aapl/"],["stockinvest","https://stockinvest.us/stock/AAPL"]]},
+
+{tk:"PLTR",epx:172,nm:"Palantir",sec:"Tech",px:180.45,chg:3.73,lo:106.37,hi:207.52,pe:148.78,fpe:91.39,eps:1.17,gr:78.9,tgt:191.68,na:32,rate:"Buy",ms:null,
+ sup:[172.01,162.66],res:[175.23,179.01],vi:5,te:5,fl:130,fh:192,en:"รอย่อ $172 (ไม่ไล่ราคา)",sl:162,t1:192,t2:208,earn:"~2 พ.ย. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$1.98 × P/E 60–80 ได้แค่ $119–158 · consensus $191.68 (+6% เท่านั้น)",
+ news:"งบ Q2 (3 ส.ค.) ระเบิด ราคาขึ้น ~30% รายได้รวมโต 93% ธุรกิจพาณิชย์สหรัฐโต 149% พร้อมปรับเป้าทั้งปีขึ้น",
+ sht:"โมเมนตัมแรงมาก ทะลุแนวต้านแล้ว แต่ราคาวิ่งเกินเป้านักวิเคราะห์ไปเกือบหมด — ไล่ราคาตอนนี้เสี่ยงสูง",
+ lng:"⚠️ fwd P/E 91 = แพงมากแม้ธุรกิจโตเร็ว ต้องโตต่อเนื่องหลายปีถึงจะคุ้มราคานี้ ถ้าเข้าให้ไซซ์เล็กเท่านั้น",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/pltr/"],["stockinvest","https://stockinvest.us/stock/PLTR"]]},
+
+{tk:"RBRK",epx:98,nm:"Rubrik",sec:"Tech",px:99.45,chg:2.0,lo:42.25,hi:106.50,pe:null,fpe:337.46,eps:-1.45,gr:45.7,tgt:103.07,na:27,rate:"Strong Buy",ms:null,
+ sup:[97.91,85.07],res:[105.09,108.44],vi:4,te:4,fl:95,fh:115,en:"$98 / รอหลังงบ 27 ส.ค.",sl:92,t1:105,t2:108,earn:"27 ส.ค. 2026 (ยืนยันแล้ว)",
+ basis:"ยังขาดทุน ประเมินจาก consensus $103 เป็นหลัก (upside เหลือน้อย)",
+ news:"AQR Capital เปิดเผยถือหุ้น 6.18% (13 ส.ค.) ราคาซื้อขายใกล้จุดสูงสุด 52 สัปดาห์ก่อนประกาศงบ",
+ sht:"⚠️ งบออก 27 ส.ค. = เหตุการณ์ชี้ขาด ราคาอยู่ใกล้จุดสูงสุด ความเสี่ยง gap ลงถ้างบพลาด",
+ lng:"ธุรกิจ cyber/data security โตดี 45.7% แต่ยังขาดทุน และ upside ถึงเป้านักวิเคราะห์เหลือแค่ ~4%",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/rbrk/"],["stockinvest","https://stockinvest.us/stock/RBRK"]]},
+
+{tk:"RKLB",epx:72,nm:"Rocket Lab",sec:"Space",px:74.31,chg:1.9,lo:37.57,hi:151.00,pe:null,fpe:null,eps:-0.28,gr:52.5,tgt:112.94,na:18,rate:"Buy",ms:null,
+ sup:[69.75,67.62],res:[80.01,84.54],vi:4,te:3,fl:85,fh:113,en:"$70–74",sl:67,t1:80,t2:85,earn:"~9–13 พ.ย. 2026 (ประมาณ)",
+ basis:"ยังไม่มีกำไร ประเมินจาก backlog $2.4B + consensus $112.94",
+ news:"งบ Q2 รายได้ทำสถิติและ backlog $2.4B แต่ถูกบดบังด้วยการเตือนว่าจรวด Neutron อาจเลื่อนบินครั้งแรกไปปี 2027 · เซ็นดีลปล่อยจรวดกับ Kepler (10 ส.ค.)",
+ sht:"ราคาอยู่เหนือแนวรับ $69.75 · หลุดแนวนี้ให้ตัดตามระบบ",
+ lng:"⚠️ Neutron เลื่อนเป็นความเสี่ยงหลัก — thesis ระยะยาวขึ้นกับจรวดลำนี้ · คุณถืออยู่ +60% พิจารณาล็อกกำไรบางส่วน",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/rklb/"],["Spaceflight Now","https://spaceflightnow.com/2026/08/10/window-for-2026-launch-debut-of-rocket-labs-neutron-rocket-is-narrowing-as-development-continues/"]]},
+
+{tk:"AVAV",epx:190,nm:"AeroVironment",sec:"Defense",px:163.58,chg:2.4,lo:135.20,hi:417.86,pe:null,fpe:50.46,eps:-5.40,gr:140.9,tgt:225.77,na:20,rate:"Buy",ms:null,
+ sup:[165.07,150.00],res:[190.89,207.24],vi:3,te:2,fl:150,fh:226,en:"รอยืนเหนือ $190",sl:158,t1:191,t2:207,earn:"8 ก.ย. 2026 (ยืนยันแล้ว)",
+ basis:"EPS ล่วงหน้า ~$3.24 × P/E 45–55 · consensus $225.77",
+ news:"รัฐบาลประกาศภาษีนำเข้าโดรนสูง (100% สำหรับโดรนเกิน 25 กก.) เมื่อ 14 ส.ค. หนุนผู้ผลิตในประเทศ แต่ราคายังห่างจุดสูงสุดมาก",
+ sht:"⚠️ ราคาร่วงจาก $417 เหลือ $163 (−61%) ยังไม่มีสัญญาณกลับตัวชัด · งบ 8 ก.ย. เป็นจุดชี้ขาด",
+ lng:"ได้ประโยชน์จากนโยบายภาษีโดรน แต่ยังขาดทุนและมีภาระจากดีล BlueHalo — ความเสี่ยงสูง",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/avav/"],["Benzinga","https://www.benzinga.com/trading-ideas/movers/26/08/61213656/whats-going-on-with-the-rise-in-aerovironment-stock"]]},
+
+{tk:"ESLT",epx:740,nm:"Elbit Systems",sec:"Defense",px:743.62,chg:-0.01,lo:447.00,hi:1016.06,pe:55.93,fpe:45.95,eps:13.27,gr:13.7,tgt:835.50,na:6,rate:"Hold",ms:null,
+ sup:[732.71,700.00],res:[769.92,776.08],vi:5,te:3,fl:700,fh:835,en:"$733–748",sl:715,t1:770,t2:800,earn:"~17–20 พ.ย. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$16.2 × P/E 35–45 · consensus $835.50 (นักวิเคราะห์แค่ 6 ราย)",
+ news:"งบ Q2 (11 ส.ค.) รายได้และกำไรโตเลขสองหลัก backlog ทำสถิติ ~$32B ตามด้วยสัญญาใหม่หลายรายการรวมถึงดีลกลาโหมยุโรป $1.635B",
+ sht:"แกว่งในกรอบ ใกล้แนวรับ · consensus เป็น Hold upside จำกัด ~3%",
+ lng:"backlog $32B ให้ความมั่นคงของรายได้ระยะยาว แต่ราคาสะท้อนไปพอควรแล้ว",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/ESLT/"],["PR Newswire","https://www.prnewswire.com/news-releases/elbit-systems-reports-second-quarter-2026-results-302848083.html"]]},
+
+{tk:"CACI",epx:643,nm:"CACI International",sec:"Defense",px:647.17,chg:0.1,lo:434.70,hi:683.50,pe:26.75,fpe:19.22,eps:24.16,gr:10.9,tgt:724.50,na:16,rate:"Buy",ms:null,
+ sup:[644.43,638.64],res:[657.32,667.57],vi:5,te:4,fl:675,fh:780,en:"$638–648",sl:625,t1:668,t2:700,earn:"~21–26 ต.ค. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$33.7 × P/E 20–24 · consensus $724.50",
+ news:"ได้รับเลือกในสัญญา US Space Force วงเงินเพดาน $981M สำหรับเทคโนโลยีฝึกอบรม (19 ส.ค.) เพิ่มจากสัญญาข่าวกรองกองทัพบก $855M",
+ sht:"ใกล้จุดสูงสุด 52 สัปดาห์ เทรนด์ขึ้นต่อเนื่อง แนวรับแน่นที่ $644",
+ lng:"fwd P/E 19 ถือว่าไม่แพงสำหรับผู้รับเหมากลาโหมที่มีสัญญาต่อเนื่อง รายได้คาดการณ์ได้ดี",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/CACI/"],["The Defense Post","https://thedefensepost.com/2026/08/19/us-space-force-caci-training/"]]},
+
+{tk:"BAC",epx:60,nm:"Bank of America",sec:"Financials",px:61.84,chg:-0.03,lo:46.12,hi:65.23,pe:14.29,fpe:12.44,eps:4.33,gr:9.3,tgt:68.77,na:24,rate:"Buy",dy:2.07,ms:null,
+ sup:[57.88,56.20],res:[63.25,64.23],vi:5,te:4,fl:60,fh:70,en:"$58–62",sl:56,t1:63,t2:65,earn:"14 ต.ค. 2026 (ยืนยันแล้ว)",
+ basis:"EPS ล่วงหน้า ~$4.97 × P/E 12–14 (ธนาคารใหญ่) · consensus $68.77",
+ news:"ตั้ง JV กับ Jio Financial Services เข้าซื้อสูงสุด 49.9% ของ Jio Credit (12 ส.ค.) · ขึ้นปันผล 14% เป็น $0.32/ไตรมาส เมื่อ 24 ก.ค.",
+ sht:"ใกล้จุดสูงสุด 52 สัปดาห์ upside ถึงเป้าเหลือ ~11% · คุณถืออยู่ +52.8%",
+ lng:"ธนาคารคุณภาพ ปันผล 2.07% ขึ้นปันผลสม่ำเสมอ เหมาะเป็น Core · ได้ประโยชน์ถ้าดอกเบี้ยไม่ลงเร็ว",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/bac/"],["stockinvest","https://stockinvest.us/stock/BAC"]]},
+
+{tk:"NDAQ",epx:97,nm:"Nasdaq Inc",sec:"Financials",px:98.41,chg:0.88,lo:76.55,hi:101.79,pe:28.45,fpe:22.28,eps:3.43,gr:14.2,tgt:109.80,na:17,rate:"Buy",dy:1.26,ms:null,
+ sup:[96.59,83.29],res:[100.00,101.79],vi:5,te:4,fl:97,fh:112,en:"$96–98",sl:93,t1:102,t2:110,earn:"21 ต.ค. 2026 (ยืนยันแล้ว)",
+ basis:"EPS ล่วงหน้า ~$4.42 × P/E 22–26 · consensus $109.80",
+ news:"ประกาศดีลเข้าซื้อ LeveL Markets ระบบเทรดทางเลือกชั้นนำของสหรัฐ (11 ส.ค.) ต่อยอดกลยุทธ์ตลาดเปิดตลอดเวลา",
+ sht:"ทะลุแนวต้านเดิมแล้ว เทรนด์ขึ้น · ราคาใกล้จุดสูงสุด",
+ lng:"ธุรกิจโครงสร้างพื้นฐานตลาดทุน รายได้สม่ำเสมอ · คุณถืออยู่ +27.8%",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/ndaq/"],["Nasdaq IR","https://ir.nasdaq.com/news-releases/news-release-details/nasdaq-announces-definitive-agreement-acquire-level-markets"]]},
+
+{tk:"SPGI",epx:428,nm:"S&P Global",sec:"Financials",px:431.73,chg:-0.10,lo:381.61,hi:559.44,pe:26.32,fpe:22.87,eps:16.42,gr:9.7,tgt:516.95,na:24,rate:"Strong Buy",dy:0.90,ms:null,
+ sup:[424.36,386.06],res:[439.83,443.46],vi:5,te:2,fl:455,fh:520,en:"$424–432",sl:410,t1:440,t2:480,earn:"22 ต.ค. 2026 (ยืนยันแล้ว)",
+ basis:"EPS ล่วงหน้า ~$18.9 × P/E 24–28 · consensus $516.95",
+ news:"ราคาร่วง ~5% หลังงบ Q2 (28 ก.ค.) กำไรพลาดเป้าและหั่นคาดการณ์กำไรปี 2026 แม้รายได้เข้าเป้าและประกาศซื้อหุ้นคืน $7B · ตอนนี้ต่ำกว่าจุดสูงสุด ~22%",
+ sht:"เทรนด์ยังลง อยู่เหนือแนวรับ $424 · รอสัญญาณกลับตัวก่อนเพิ่ม",
+ lng:"ธุรกิจ credit rating + ดัชนี เป็น moat ที่แข็งมาก ราคาลงมา 22% ทำให้ valuation น่าสนใจขึ้น แต่ต้องรอโมเมนตัมกลับ",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/spgi/"],["Motley Fool","https://www.fool.com/investing/2026/07/28/why-sp-global-stock-was-tumbling-on-tuesday/"]]},
+
+{tk:"BRK.B",epx:493,nm:"Berkshire Hathaway",sec:"Financials",px:498.24,chg:0.28,lo:464.01,hi:537.74,pe:12.40,fpe:22.61,eps:39.77,gr:3.9,tgt:547.67,na:4,rate:"Buy",ms:null,
+ sup:[489.46,488.13],res:[500.39,512.37],vi:5,te:3,fl:490,fh:550,en:"$489–498",sl:480,t1:512,t2:538,earn:"2 พ.ย. 2026",
+ basis:"EPS ล่วงหน้า ~$22 × P/E 22–25 · consensus $547.67 (P/E ย้อนหลัง 12.4 บิดเบือนจากกำไรลงทุน)",
+ news:"ภายใต้ซีอีโอ Greg Abel เบิร์กเชียร์ลงทุนในหุ้น $19.8B ในไตรมาส 2 (รวมเพิ่มสัดส่วน Alphabet ~$17B) และซื้อหุ้นคืนมากกว่าไตรมาสก่อน 19 เท่า (19 ส.ค.)",
+ sht:"แกว่งแคบ อยู่เหนือแนวรับ $489 · เป็นหุ้นตั้งรับมากกว่าเก็งกำไร",
+ lng:"ตัวถ่วงความผันผวนของพอร์ต ถือเงินสดมหาศาล ซื้อหุ้นคืนเพิ่ม = สัญญาณผู้บริหารมองว่าราคาถูก",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/brk.b/"],["stockinvest","https://stockinvest.us/stock/BRK-B"]]},
+
+{tk:"SOFI",epx:18.1,nm:"SoFi Technologies",sec:"Financials",px:18.98,chg:5.9,lo:14.88,hi:32.73,pe:39.96,fpe:25.69,eps:0.47,gr:40.9,tgt:19.98,na:24,rate:"Hold",ms:null,
+ sup:[17.72,17.31],res:[19.00,19.49],vi:4,te:3,fl:18.5,fh:22,en:"$17.7–18.5",sl:17.2,t1:19.0,t2:19.5,earn:"~28–29 ต.ค. 2026 (ประมาณ)",
+ basis:"EPS ล่วงหน้า ~$0.74 × P/E 25–30 · consensus $19.98 (+5% เท่านั้น, เรตติ้ง Hold)",
+ news:"งบ Q2 เข้าเป้า รายได้สุทธิปรับแล้ว $1.21B และปรับเป้าทั้งปีขึ้นเป็นโต 32–35% แต่ Morgan Stanley ตั้งคำถามเรื่องการใช้เงินทุนที่สูงขึ้น (18 ส.ค.)",
+ sht:"เด้งแรง +5.9% วันนี้ ชนแนวต้าน $19 · upside ถึงเป้าเหลือน้อย",
+ lng:"fintech ที่เริ่มมีกำไรแล้ว โตดี 41% แต่ consensus ให้แค่ Hold — ระวังการใช้เงินทุนหนักขึ้น",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/SOFI/"],["stockinvest","https://stockinvest.us/stock/SOFI"]]},
+
+{tk:"O",epx:62,nm:"Realty Income",sec:"REIT",px:62.80,chg:-0.59,lo:55.86,hi:67.94,pe:46.16,fpe:37.81,eps:1.37,gr:10.7,tgt:68.21,na:24,rate:"Hold",dy:5.18,ms:null,
+ sup:[62.59,61.28],res:[63.12,65.71],vi:4,te:3,fl:62,fh:70,en:"$61.3–62.8",sl:59.5,t1:65.7,t2:68,earn:"9 พ.ย. 2026 (ยืนยันแล้ว)",
+ basis:"REIT ประเมินจาก AFFO $4.44–4.45 × 14–16 เท่า · consensus $68.21",
+ news:"งบ Q2 (5 ส.ค.) ปรับเป้า AFFO ทั้งปีขึ้นเป็น $4.44–4.45 และเพิ่มเป้าการลงทุนเป็น $10B จากท่อดีลที่แข็งแรง",
+ sht:"แกว่งแคบใกล้แนวรับ · ขึ้น XD 31 ส.ค. (ปันผลรายเดือน)",
+ lng:"ปันผล 5.18% จ่ายรายเดือน เหมาะสำหรับกระแสเงินสด · ⚠️ อ่อนไหวกับดอกเบี้ยมาก ถ้า Fed ไม่ลดดอกเบี้ยจะกดดัน",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/o/"],["Motley Fool","https://www.fool.com/investing/2026/08/06/realty-income-raised-its-2026-affo-guidance-heres-what-that-means-for-its-52-dividend/"]]},
+
+{tk:"DX",epx:12.9,nm:"Dynex Capital",sec:"REIT",px:13.10,chg:0.15,lo:11.83,hi:14.93,pe:5.55,fpe:8.89,eps:2.36,gr:366.1,tgt:14.75,na:6,rate:"Buy",dy:15.57,ms:null,
+ sup:[12.76,12.71],res:[13.01,13.80],vi:3,te:2,fl:12.3,fh:14.75,en:"$12.7–13.1",sl:12.2,t1:13.8,t2:14.7,earn:"ยังไม่กำหนด",
+ basis:"mortgage REIT ประเมินจากมูลค่าตามบัญชี $12.92/หุ้น × 0.95–1.15 เท่า (P/B ปัจจุบัน ~1.01)",
+ news:"ประกาศปันผลรายเดือนปกติ $0.17 สำหรับเดือน ส.ค. (11 ส.ค.) · มูลค่าตามบัญชี $12.92/หุ้น",
+ sht:"ซื้อขายใกล้มูลค่าตามบัญชีพอดี · ขึ้น XD 21 ส.ค.",
+ lng:"⚠️ ปันผล 15.57% สูงมากแต่มาพร้อมความเสี่ยงสูง — mortgage REIT ใช้เลเวอเรจสูงและอ่อนไหวกับดอกเบี้ยรุนแรง ปันผลอาจถูกหั่นได้",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/dx/statistics/"],["Businesswire","https://www.businesswire.com/news/home/20260811131149/en/Dynex-Capital-Inc.-Declares-Monthly-Common-Stock-Dividend-of-$0.17"]]},
+
+{tk:"TSLA",epx:342,nm:"Tesla",sec:"Consumer",px:363.60,chg:5.35,lo:297.38,hi:498.83,pe:375.24,fpe:181.30,eps:1.08,gr:11.8,tgt:395.34,na:47,rate:"Buy",ms:null,
+ sup:[342.27,319.69],res:[391.00,393.45],vi:3,te:4,fl:250,fh:395,en:"รอย่อ $342 (ไม่ไล่)",sl:319,t1:391,t2:420,earn:"28 ต.ค. 2026 (ยืนยันแล้ว)",
+ basis:"EPS ล่วงหน้า ~$2.01 · แม้ให้ P/E 100 ยังได้แค่ ~$201 · consensus $395 (สะท้อนมูลค่า robotaxi ที่ยังไม่เกิด)",
+ news:"หน่วยงานขนส่งรัฐเนวาดาอนุมัติใบอนุญาต robotaxi เชิงพาณิชย์สำหรับ Cybercab สูงสุด 5,000 คันใน Clark County ทำให้ราคาพุ่ง 5.35% วันนี้",
+ sht:"เด้งแรงจากข่าว robotaxi ทะลุแนวรับขึ้นมา · แต่ไล่ราคาหลัง gap +5% ผิดกฎระบบ รอย่อ",
+ lng:"⚠️ fwd P/E 181 = ราคาสะท้อนความคาดหวัง robotaxi/AI ที่ยังพิสูจน์ไม่ได้ · รายได้โตแค่ 11.8% ความเสี่ยงสูงมากถ้าเรื่องราวไม่เป็นจริง",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/tsla/"],["Investing.com","https://www.investing.com/news/stock-market-news/why-is-tesla-stock-rallying-today-93CH-4871900"]]},
+
+{tk:"MP",epx:57,nm:"MP Materials",sec:"Materials",px:59.55,chg:8.19,lo:37.81,hi:100.25,pe:null,fpe:134.87,eps:-0.34,gr:71.9,tgt:75.38,na:18,rate:"Strong Buy",ms:null,
+ sup:[54.66,51.11],res:[58.74,61.74],vi:4,te:4,fl:50,fh:75,en:"$54.7–59.5 (เบรกขึ้น)",sl:51,t1:61.7,t2:75,earn:"29 ต.ค. 2026",
+ basis:"ยังขาดทุน · ประเมินจาก consensus $75.38 และมูลค่าเชิงกลยุทธ์ของแร่หายาก",
+ news:"ราคาพุ่งจากนโยบายกลาโหมสหรัฐ — ภาษีโดรนนำเข้าและสัญญาขีปนาวุธ Boeing/RTX ที่ขยายตัว หนุนความต้องการแร่หายากในประเทศ · Q2 รายได้โต 89% พร้อมสัญญา gadolinium ระดับเก้าหลัก",
+ sht:"เบรกทะลุแนวต้าน $58.74 พร้อมวอลุ่ม +8.2% วันนี้ · เป็น gap แบบ breakaway ตามเกณฑ์ระบบ",
+ lng:"ผู้ผลิตแร่หายากรายเดียวในสหรัฐ = moat เชิงยุทธศาสตร์ ได้ประโยชน์ตรงจากนโยบายความมั่นคง · คุณถืออยู่ −20.8% ตอนนี้กำลังฟื้น",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/mp/"],["Benzinga","https://www.benzinga.com/trading-ideas/movers/26/08/61221844/mp-materials-stock-surges-friday-amid-defense-policy-shifts"]]},
+
+{tk:"GEV",epx:975,nm:"GE Vernova",sec:"Utilities",px:966.01,chg:-2.17,lo:530.16,hi:1195.94,pe:27.65,fpe:45.11,eps:34.94,gr:13.0,tgt:1239.46,na:38,rate:"Buy",dy:0.21,ms:null,
+ sup:[968.32,930.00],res:[1048.86,1077.08],vi:5,te:3,fl:900,fh:1240,en:"$930–985",sl:920,t1:1049,t2:1077,earn:"28 ต.ค. 2026 (ยืนยันแล้ว)",
+ basis:"EPS ล่วงหน้า ~$21.4 × P/E 35–45 · consensus $1,239 (P/E ย้อนหลังบิดเบือนจากรายการพิเศษ)",
+ news:"ราคาพุ่ง 8.9% หลัง backlog พุ่งเป็น $176B โดยคำสั่งซื้อกลุ่ม Power/Electrification โตเชิงอินทรีย์ 88% พร้อมความร่วมมือ SHINE ด้านนิวเคลียร์ภายใต้โครงการ DOE (18 ส.ค.)",
+ sht:"ย่อลงมาทดสอบแนวรับ $968 · ถ้ายืนได้เป็นจุดเข้าที่ risk ชัด",
+ lng:"ได้ประโยชน์จากความต้องการไฟฟ้าที่พุ่งจากดาต้าเซ็นเตอร์ AI · backlog $176B ให้ทัศนวิสัยรายได้ยาว · คุณถืออยู่ −14.2%",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/gev/"],["Yahoo Finance","https://finance.yahoo.com/energy/articles/ge-vernova-gev-8-9-131056565.html"]]},
+
+{tk:"EOSE",epx:3.645,nm:"Eos Energy",sec:"Energy",px:3.645,chg:5.4,lo:3.11,hi:19.86,pe:null,fpe:null,eps:-5.50,gr:533.9,tgt:6.67,na:11,rate:"Buy (ถูกหั่นเป้า)",ms:null,
+ sup:[3.61,3.47],res:[3.82,4.24],vi:1,te:1,fl:2.5,fh:6.5,en:"ไม่แนะนำเข้าใหม่",sl:3.45,t1:3.82,t2:4.24,earn:"~4–6 พ.ย. 2026 (ประมาณ)",
+ basis:"ขาดทุนหนัก ประเมินมูลค่าไม่มีฐานที่มั่นคง · เป้านักวิเคราะห์กำลังถูกปรับลดหลายราย",
+ news:"งบ Q2 (5 ส.ค.) ขาดทุนกว้างขึ้นและหั่นคาดการณ์รายได้ทั้งปี ทำให้ราคาร่วง ~12% ซ้ำเติมด้วยการเปิดเผยการสอบสวนทางกฎหมายจากผู้ถือหุ้น (20 ส.ค.)",
+ sht:"🔴 ราคาร่วงจาก $19.86 เหลือ $3.65 (−82%) · มีประเด็นกฎหมาย ความเสี่ยงสูงมาก",
+ lng:"⚠️ คุณถืออยู่ — ตามกฎระบบ (พื้นฐานเปลี่ยน + มีคดี) นี่คือกรณีที่ควรทบทวน thesis อย่างจริงจัง ไม่ใช่ถัวเฉลี่ยขาลง",
+ src:[["stockanalysis","https://stockanalysis.com/stocks/EOSE/"],["Eos IR","https://investors.eose.com/news-releases/news-release-details/eos-energy-enterprises-reports-second-quarter-2026-financial"]]}
+];
+/* ============ helpers ============ */
+const $=id=>document.getElementById(id);
+const fmt=(n,d)=>{if(n===null||n===undefined||!isFinite(n))return"—";
+  const dd=(d!==undefined)?d:(Math.abs(n)>=100?2:(Math.abs(n)>=10?2:2));
+  return n.toLocaleString("en-US",{minimumFractionDigits:dd,maximumFractionDigits:dd});};
+const money=n=>(n===null||n===undefined||!isFinite(n))?"—":"$"+fmt(n);
+const pct=n=>(n===null||!isFinite(n))?"—":(n>=0?"+":"")+n.toFixed(1)+"%";
+function fairMid(s){return (s.fl+s.fh)/2;}
+function upside(s){return (fairMid(s)-s.px)/s.px*100;}
+function signalOf(s){
+  const up=upside(s);
+  if(s.te<=1||s.vi<=2||up<-10)return{k:"crit",ic:"🔴",tx:"ยังไม่เข้าเกณฑ์",sh:"ยังไม่เข้า"};
+  if(s.vi>=4&&s.te>=3&&up>=8)return{k:"good",ic:"🟢",tx:"เข้าเกณฑ์",sh:"เข้าเกณฑ์"};
+  return{k:"warn",ic:"🟡",tx:"เฝ้าดู",sh:"เฝ้าดู"};
+}
+const SIGCOL={good:"#3ec93e",warn:"#fab219",crit:"#f06a6a"};
+
+/* ============ chips ============ */
+let curTk=null;
+function renderChips(filter){
+  const f=(filter||"").trim().toUpperCase();
+  const box=$("chips");box.innerHTML="";
+  const list=STOCKS.filter(s=>!f||s.tk.includes(f)||s.nm.toUpperCase().includes(f)||s.sec.toUpperCase().includes(f)
+    ||(f==="ชิป"||f==="ชิพ")&&s.sec==="Semis"||(f==="ธนาคาร"&&s.sec==="Financials"));
+  if(!list.length){box.innerHTML='<div class="empty">ไม่พบหุ้นที่ค้นหา — ใช้เครื่องคำนวณด้านล่างสำหรับหุ้นนอกฐานข้อมูล</div>';return;}
+  list.forEach(s=>{
+    const sg=signalOf(s);
+    const b=document.createElement("button");
+    b.className="chip"+(s.tk===curTk?" on":"");
+    b.innerHTML=`<span class="dot" style="background:${SIGCOL[sg.k]}"></span>${s.tk}`;
+    b.onclick=()=>{selectStock(s.tk);};
+    box.appendChild(b);
+  });
+}
+
+/* ============ gauge ============ */
+const clampLab=v=>Math.max(22,Math.min(78,v));
+function gaugeHTML(s){
+  const tgt=s.tgt||null;
+  const lo=Math.min(s.px,s.fl)*0.93;
+  const hi=Math.max(s.px,s.fh,tgt||0)*1.05;
+  const P=v=>Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100));
+  const bandL=P(s.fl),bandW=P(s.fh)-P(s.fl),pxP=P(s.px);
+  const up=upside(s);
+  let verdict,vc;
+  if(s.px<s.fl){verdict="ต่ำกว่าช่วงเหมาะสม (น่าสนใจ)";vc=SIGCOL.good;}
+  else if(s.px>s.fh){verdict="สูงกว่าช่วงเหมาะสม (แพง)";vc=SIGCOL.crit;}
+  else{verdict="อยู่ในช่วงเหมาะสม";vc=SIGCOL.warn;}
+  return `<div class="gauge">
+    <div class="gcap"><span>ราคาเหมาะสมที่ประเมินได้</span><span style="color:${vc};font-weight:700">${verdict}</span></div>
+    <div class="gtrack">
+      <div class="gband" style="left:${bandL}%;width:${bandW}%"></div>
+      <div class="glab bot" style="left:${clampLab(bandL+bandW/2)}%;color:var(--c1)">เหมาะสม ${money(s.fl)}–${money(s.fh)}</div>
+      <div class="gmark" style="left:${pxP}%"></div>
+      <div class="glab top" style="left:${clampLab(pxP)}%">ราคาตอนนี้ ${money(s.px)}</div>
+      ${tgt?`<div class="gmark tgt" style="left:${P(tgt)}%"></div>`:""}
+    </div>
+    <div class="gcap"><span>${money(lo)}</span>
+      <span style="color:var(--c4)">${tgt?"เส้นเหลือง = เป้านักวิเคราะห์ "+money(tgt):""}</span>
+      <span>${money(hi)}</span></div>
+    <div style="font-size:12.5px;margin-top:8px">ส่วนต่างจากค่ากลาง (${money(fairMid(s))}): <b style="color:${up>=0?'var(--up)':'var(--down)'}">${pct(up)}</b></div>
+  </div>`;
+}
+function pipsHTML(score,max,thresh,label){
+  let p="";
+  for(let i=0;i<max;i++){
+    const on=i<score;
+    const cls=on?(score>=thresh?"pip on pass":"pip on fail"):"pip";
+    p+=`<div class="${cls}"></div>`;
+  }
+  return `<div class="sc"><div class="lab"><span>${label}</span><span style="color:${score>=thresh?'#3ec93e':'#f06a6a'}">${score}/${max} ${score>=thresh?"ผ่าน":"ไม่ผ่าน"}</span></div><div class="pips">${p}</div><div style="font-size:10px;color:var(--dim);margin-top:5px">เกณฑ์ผ่าน ≥ ${thresh}</div></div>`;
+}
+
+/* ============ detail ============ */
+function selectStock(tk){
+  curTk=tk;renderChips($("q").value);
+  const s=STOCKS.find(x=>x.tk===tk);if(!s)return;
+  const sg=signalOf(s);
+  const S=loadSet();
+  const EP=(s.epx&&s.epx>0)?s.epx:s.px;                 // ราคาเข้าตามแผน
+  const risk=(s.sl&&EP>s.sl)?(EP-s.sl):null;            // ความเสี่ยง/หุ้น จากจุดเข้าตามแผน
+  const sugg=(risk&&S.port>0)?Math.floor((S.port*(S.risk/100))/risk):null;
+  const rr=(risk&&s.t1)?((s.t1-EP)/risk):null;
+  const tooBig=(sugg===0);
+  const stats=[
+    ["P/E ย้อนหลัง",s.pe?fmt(s.pe):"ขาดทุน"],
+    ["P/E ล่วงหน้า",s.fpe?fmt(s.fpe):"—"],
+    ["รายได้โต",pct(s.gr)],
+    ["EPS",s.eps!==null?fmt(s.eps):"—"],
+    ["เป้านักวิเคราะห์",money(s.tgt)+(s.na?` <span class="dim">(${s.na})</span>`:"")],
+    ["เรตติ้ง",s.rate||"—"],
+    ["ช่วง 52 สัปดาห์",money(s.lo)+" – "+money(s.hi)],
+    ["ปันผล",s.dy?s.dy+"%":"ไม่มี"],
+    ["Morningstar",s.ms?money(s.ms):'<span class="dim">ไม่เปิดเผย</span>']
+  ];
+  $("detail").innerHTML=`
+    <div class="dhead">
+      <div><div class="dtk">${s.tk}</div><div class="dnm">${s.nm} · ${s.sec}</div></div>
+      <div><div class="dpx">${money(s.px)}</div><div class="dchg ${s.chg>=0?'g':'r'}">${pct(s.chg)} วันนี้</div></div>
+    </div>
+    <div style="margin:10px 0 2px"><span class="vbadge v-${sg.k}">${sg.ic} ${sg.tx}</span>
+      <span class="vbadge" style="background:var(--card2);color:var(--mut)">📅 งบ: ${s.earn}</span></div>
+    ${gaugeHTML(s)}
+    <div style="font-size:11.5px;color:var(--mut);background:var(--card2);border-radius:9px;padding:9px;margin-bottom:4px"><b>วิธีประเมิน:</b> ${s.basis}</div>
+    <div class="scores">${pipsHTML(s.vi,6,4,"พื้นฐาน (VI)")}${pipsHTML(s.te,5,3,"เทคนิค")}</div>
+    <div class="sec-title" style="margin-top:14px">แผนเทรดตามกฎระบบ</div>
+    <div class="plan">
+      <div class="pl"><b>โซนเข้า</b>${s.en}</div>
+      <div class="pl"><b>Stop (ตัดขาดทุน)</b>${money(s.sl)}${risk?` <span class="dim">(−${(risk/EP*100).toFixed(1)}% จากจุดเข้า)</span>`:""}</div>
+      <div class="pl"><b>เป้าที่ 1</b>${money(s.t1)}</div>
+      <div class="pl"><b>เป้าที่ 2</b>${money(s.t2)}</div>
+      <div class="pl"><b>R:R (ถึงเป้า 1)</b>${rr?`<span style="color:${rr>=2?'#3ec93e':(rr>=1?'inherit':'#f06a6a')}">1 : ${rr.toFixed(1)}</span>`:"—"}</div>
+      <div class="pl"><b>ซื้อได้กี่หุ้น</b>${tooBig?'<span style="color:#fab219">พอร์ตเล็กเกินไป</span>':(sugg!==null?sugg+" หุ้น":"—")} <span class="dim">(เสี่ยง ${S.risk}%)</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--mut);margin-top:2px">ตัวเลข R:R และจำนวนหุ้น คำนวณจาก<b> จุดเข้าตามแผน ${money(EP)}</b> ไม่ใช่ราคาตลาดปัจจุบัน${tooBig?" · ความเสี่ยงต่อหุ้นสูงกว่างบเสี่ยงที่ตั้งไว้ ถ้าจะเข้าต้องลดขนาดพอร์ตต่อดีลหรือรอราคาใกล้ stop กว่านี้":""}</div>
+    ${rr!==null&&rr<1?'<div class="alert a-warn" style="margin-top:8px">⚠️ R:R ต่ำกว่า 1:1 — เสี่ยงมากกว่าผลตอบแทนที่คาด ตามกฎระบบไม่ควรเข้าที่ระดับนี้</div>':""}
+    <div class="note"><div class="nt">📰 ข่าว / catalyst ล่าสุด</div>${s.news}</div>
+    <div class="note"><div class="nt">⏱ มุมมองระยะสั้น (เทคนิค)</div>${s.sht}</div>
+    <div class="note"><div class="nt">📆 มุมมองระยะยาว (VI)</div>${s.lng}</div>
+    <div class="srcline">แหล่งอ้างอิง: ${s.src.map(x=>`<a href="${x[1]}" target="_blank" rel="noopener">${x[0]}</a>`).join(" · ")}</div>
+    <div class="mini" id="dmini"></div>`;
+  miniChart($("dmini"),s.tk);
+  $("detail").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* ============ ranking ============ */
+function renderRank(){
+  const tb=document.querySelector("#rank tbody");tb.innerHTML="";
+  const arr=STOCKS.slice().sort((a,b)=>((b.vi+b.te)-(a.vi+a.te))||(upside(b)-upside(a)));
+  arr.forEach(s=>{
+    const sg=signalOf(s),up=upside(s);
+    const tr=document.createElement("tr");tr.className="clk";
+    tr.innerHTML=`<td><b>${s.tk}</b><br><span class="dim" style="font-size:10.5px">${s.sec}</span></td>
+      <td>${money(s.px)}</td>
+      <td style="color:${s.vi>=4?'#3ec93e':'#f06a6a'}">${s.vi}/6</td>
+      <td style="color:${s.te>=3?'#3ec93e':'#f06a6a'}">${s.te}/5</td>
+      <td>${money(s.fl)}–${money(s.fh)}</td>
+      <td class="${up>=0?'g':'r'}">${pct(up)}</td>
+      <td><span class="vbadge v-${sg.k}" style="font-size:10.5px;padding:3px 7px;white-space:nowrap">${sg.ic} ${sg.sh}</span></td>`;
+    tr.onclick=()=>selectStock(s.tk);
+    tb.appendChild(tr);
+  });
+}
+
+/* ============ calculator ============ */
+$("c_go").onclick=()=>{
+  const tk=($("c_tk").value||"หุ้นนี้").toUpperCase();
+  const px=parseFloat($("c_px").value),eps=parseFloat($("c_eps").value),gr=parseFloat($("c_gr").value);
+  const tgt=parseFloat($("c_tgt").value),sup=parseFloat($("c_sup").value);
+  const out=$("c_out");out.style.display="block";
+  if(!isFinite(px)||!isFinite(eps)||!isFinite(gr)){
+    out.innerHTML='<span style="color:#f06a6a">กรุณากรอก ราคาปัจจุบัน, EPS ล่วงหน้า และ การเติบโต ให้ครบ</span>';return;}
+  if(eps<=0){
+    out.innerHTML='<span style="color:#fab219">⚠️ EPS ติดลบหรือเป็นศูนย์ — บริษัทยังไม่มีกำไร ประเมินด้วย P/E ไม่ได้</span><br><span class="dim">ให้ยึดเป้านักวิเคราะห์เป็นหลัก และจำไว้ว่าหุ้นที่ยังไม่มีกำไรมีความเสี่ยงสูงกว่ามาก ควรใช้ไซซ์เล็ก</span>';return;}
+
+  // ช่วงราคาเหมาะสม = จากวิธี P/E เท่านั้น (เป้านักวิเคราะห์แสดงแยกเป็นเส้นอ้างอิง)
+  const peLynch=Math.max(10,Math.min(35,gr));
+  const peCons=Math.max(8,Math.min(28,gr*0.8));
+  const vLynch=eps*peLynch, vCons=eps*peCons;
+  const fl=Math.min(vCons,vLynch), fh=Math.max(vCons,vLynch), mid=(fl+fh)/2;
+  const up=(mid-px)/px*100;
+  let verdict,vc;
+  if(px<fl){verdict="ต่ำกว่าช่วงเหมาะสม — น่าสนใจ";vc="#3ec93e";}
+  else if(px>fh){verdict="สูงกว่าช่วงเหมาะสม — แพง";vc="#f06a6a";}
+  else{verdict="อยู่ในช่วงเหมาะสม";vc="#fab219";}
+
+  // เตือนเมื่อเป้านักวิเคราะห์ต่างจากการประเมินมาก
+  let disag="";
+  if(isFinite(tgt)&&tgt>0){
+    const gap=(tgt-mid)/mid*100;
+    if(Math.abs(gap)>35){
+      disag='<div class="alert a-warn" style="margin-top:9px">⚠️ เป้านักวิเคราะห์ ('+money(tgt)+') ต่างจากการประเมินด้วย P/E ('+money(mid)+') ถึง '+pct(gap)+
+      '<br><span style="font-weight:400">แปลว่านักวิเคราะห์คาดว่ากำไรจะโตแรงกว่าที่สูตรนี้คิด หรือไม่ก็ประเมินไว้สูงเกินจริง — อย่าเชื่อตัวเลขใดตัวเลขหนึ่งอย่างเดียว ควรอ่านเหตุผลเบื้องหลังก่อน</span></div>';
+    }
+  }
+
+  const stop=isFinite(sup)&&sup<px?sup*0.97:px*0.93;
+  const S=loadSet(),rk=px-stop;
+  const sh=(rk>0&&S.port>0)?Math.floor((S.port*(S.risk/100))/rk):null;
+  const cyc=gr>60?'<div class="alert a-warn" style="margin-top:9px">⚠️ การเติบโตสูงมาก (&gt;60%) — ถ้าเป็นหุ้นวัฏจักร (ชิป/โภคภัณฑ์) P/E ที่ดูถูกมักเกิดตอนกำไรพีค ระวังกับดักมูลค่า</div>':"";
+
+  out.innerHTML='<div style="font-size:15px;font-weight:800;margin-bottom:6px">'+tk+' — ราคาเหมาะสม '+money(fl)+' – '+money(fh)+'</div>'+
+    '<div>ค่ากลาง <b>'+money(mid)+'</b> · ราคาตอนนี้ '+money(px)+' · ส่วนต่าง <b style="color:'+(up>=0?'#26c281':'#ff5c7a')+'">'+pct(up)+'</b></div>'+
+    '<div style="color:'+vc+';font-weight:700;margin:6px 0">'+verdict+'</div>'+
+    '<div style="border-top:1px solid var(--line);margin:9px 0;padding-top:9px">'+
+      '<div class="dim" style="font-size:10.5px;font-weight:700;margin-bottom:4px">ที่มาของตัวเลข</div>'+
+      '• แนว PEG (P/E ≈ อัตราการเติบโต '+peLynch.toFixed(0)+'): '+money(vLynch)+'<br>'+
+      '• แบบอนุรักษ์นิยม (P/E '+peCons.toFixed(0)+'): '+money(vCons)+'<br>'+
+      (isFinite(tgt)&&tgt>0?'• เป้านักวิเคราะห์ (อ้างอิงแยก): '+money(tgt)+'<br>':'')+
+    '</div>'+
+    '<div style="border-top:1px solid var(--line);padding-top:9px">'+
+      '<div class="dim" style="font-size:10.5px;font-weight:700;margin-bottom:4px">แผนเทรดตามกฎเสี่ยง '+S.risk+'%</div>'+
+      'Stop แนะนำ <b>'+money(stop)+'</b> (−'+((px-stop)/px*100).toFixed(1)+'%) · ซื้อได้ <b>'+
+      (sh===0?'<span style="color:#fab219">พอร์ตเล็กเกินไปสำหรับหุ้นราคานี้</span>':(sh!==null?sh+' หุ้น':'—'))+'</b><br>'+
+      'เป้าแรกที่คุ้มความเสี่ยง (R:R 1:2) '+money(px+rk*2)+
+    '</div>'+disag+cyc+
+    '<div class="dim" style="margin-top:9px;font-size:10.5px">⚠️ เป็นการประมาณจากสูตร ไม่ใช่การทำนายอนาคต · P/E ที่เหมาะสมขึ้นกับคุณภาพธุรกิจและวัฏจักรด้วย ตรวจสอบพื้นฐานและข่าวก่อนตัดสินใจเสมอ</div>';
+};
+
+/* ============ sectors ============ */
+const sectors=[{n:"Technology",v:44.93,c:"var(--c1)"},{n:"Financials",v:19.36,c:"var(--c2)"},
+{n:"Industrials",v:14.62,c:"var(--c3)"},{n:"Real Estate",v:10.59,c:"var(--c4)"},
+{n:"Cons. Disc.",v:7.18,c:"var(--c5)"},{n:"Materials",v:2.85,c:"var(--c6)"},{n:"Utilities",v:0.47,c:"var(--c7)"}];
+(function(){const CAP=40,mx=Math.max(...sectors.map(s=>s.v),CAP),el=$("sectors");
+sectors.forEach(s=>{const o=s.v>CAP,d=document.createElement("div");d.className="row";
+d.innerHTML=`<div class="lbl">${s.n}</div><div class="bar-wrap"><div class="bar" style="width:${(s.v/mx*100).toFixed(1)}%;background:${s.c}">${s.v}%</div><div class="cap-line" style="left:${(CAP/mx*100).toFixed(1)}%"></div></div><div class="val" style="color:${o?'#f06a6a':'var(--tx)'}">${s.v}%</div>`;
+el.appendChild(d);});})();
+
+/* ============ portfolio manager ============ */
 const K_ITEMS="pf_items_v1",K_SET="pf_set_v1";
 let mode="buy",editId=null;
-const $=id=>document.getElementById(id);
 function loadItems(){try{return JSON.parse(localStorage.getItem(K_ITEMS))||[]}catch(e){return[]}}
-function saveItems(a){try{localStorage.setItem(K_ITEMS,JSON.stringify(a))}catch(e){alert("บันทึกไม่ได้ (พื้นที่เต็มหรือโหมดส่วนตัว)")}}
+function saveItems(a){try{localStorage.setItem(K_ITEMS,JSON.stringify(a))}catch(e){alert("บันทึกไม่ได้")}}
 function loadSet(){try{return JSON.parse(localStorage.getItem(K_SET))||{port:1543.61,risk:1.5}}catch(e){return{port:1543.61,risk:1.5}}}
 function saveSet(){const s={port:parseFloat($("s_port").value)||0,risk:parseFloat($("s_risk").value)||0};
-  try{localStorage.setItem(K_SET,JSON.stringify(s))}catch(e){} render();}
-const st0=loadSet();$("s_port").value=st0.port;$("s_risk").value=st0.risk;
+  try{localStorage.setItem(K_SET,JSON.stringify(s))}catch(e){} render();if(curTk)selectStock(curTk);}
+(function(){const s=loadSet();$("s_port").value=s.port;$("s_risk").value=s.risk;})();
 $("s_port").addEventListener("change",saveSet);$("s_risk").addEventListener("change",saveSet);
-
-function setMode(m){mode=m;
-  $("segBuy").classList.toggle("on",m==="buy");
-  $("segWatch").classList.toggle("on",m==="watch");
-  $("lb_entry").textContent = m==="buy" ? "ราคาที่ซื้อ *" : "ราคาที่อยากเข้า *";
-  $("wrap_qty").style.display = m==="buy" ? "" : "none";
-}
-$("segBuy").onclick=()=>setMode("buy");
-$("segWatch").onclick=()=>setMode("watch");
-
+function setMode(m){mode=m;$("segBuy").classList.toggle("on",m==="buy");$("segWatch").classList.toggle("on",m==="watch");
+  $("lb_entry").textContent=m==="buy"?"ราคาที่ซื้อ *":"ราคาที่อยากเข้า *";
+  $("wrap_qty").style.display=m==="buy"?"":"none";}
+$("segBuy").onclick=()=>setMode("buy");$("segWatch").onclick=()=>setMode("watch");
 function num(v){const n=parseFloat(v);return isFinite(n)?n:null}
 function clearForm(){["f_ticker","f_entry","f_qty","f_stop","f_target","f_cur","f_note"].forEach(i=>$(i).value="");
   editId=null;$("btnSave").textContent="บันทึกเข้ารายการ";$("btnCancel").style.display="none";}
-
 $("btnSave").onclick=()=>{
-  const tk=($("f_ticker").value||"").trim().toUpperCase().replace(/\s+/g,"");
-  const entry=num($("f_entry").value);
+  const tk=($("f_ticker").value||"").trim().toUpperCase().replace(/\s+/g,""),entry=num($("f_entry").value);
   if(!tk){alert("กรุณาใส่ชื่อย่อหุ้น");return}
-  if(entry===null||entry<=0){alert("กรุณาใส่ราคา (ตัวเลขมากกว่า 0)");return}
+  if(entry===null||entry<=0){alert("กรุณาใส่ราคา");return}
   const it={id:editId||("i"+Date.now()+Math.floor(Math.random()*999)),type:mode,tk:tk,entry:entry,
     qty:num($("f_qty").value),stop:num($("f_stop").value),target:num($("f_target").value),
     cur:num($("f_cur").value),note:($("f_note").value||"").trim()};
   const a=loadItems();
-  if(editId){const ix=a.findIndex(x=>x.id===editId); if(ix>=0)a[ix]=it; else a.push(it);}
-  else a.push(it);
-  saveItems(a);clearForm();render();
-};
-$("btnCancel").onclick=()=>{clearForm();};
-
-$("btnExport").onclick=()=>{
-  const data=JSON.stringify({items:loadItems(),set:loadSet()});
-  const ta=document.createElement("textarea");ta.value=data;document.body.appendChild(ta);
-  ta.select();
-  try{document.execCommand("copy");alert("คัดลอกข้อมูลสำรองแล้ว — เก็บข้อความนี้ไว้ในโน้ต");}
-  catch(e){prompt("คัดลอกข้อความนี้เก็บไว้:",data);}
-  document.body.removeChild(ta);
-};
-$("btnImport").onclick=()=>{
-  const s=prompt("วางข้อมูลสำรองที่นี่:");
-  if(!s)return;
-  try{const o=JSON.parse(s);
-    if(o.items)saveItems(o.items);
+  if(editId){const ix=a.findIndex(x=>x.id===editId);if(ix>=0)a[ix]=it;else a.push(it);}else a.push(it);
+  saveItems(a);clearForm();render();};
+$("btnCancel").onclick=clearForm;
+$("btnExport").onclick=()=>{const data=JSON.stringify({items:loadItems(),set:loadSet()});
+  const ta=document.createElement("textarea");ta.value=data;document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");alert("คัดลอกข้อมูลสำรองแล้ว เก็บไว้ในโน้ต");}catch(e){prompt("คัดลอกเก็บไว้:",data);}
+  document.body.removeChild(ta);};
+$("btnImport").onclick=()=>{const s=prompt("วางข้อมูลสำรอง:");if(!s)return;
+  try{const o=JSON.parse(s);if(o.items)saveItems(o.items);
     if(o.set){localStorage.setItem(K_SET,JSON.stringify(o.set));$("s_port").value=o.set.port;$("s_risk").value=o.set.risk;}
-    render();alert("กู้คืนสำเร็จ");}
-  catch(e){alert("ข้อมูลไม่ถูกต้อง");}
-};
-
+    render();alert("กู้คืนสำเร็จ");}catch(e){alert("ข้อมูลไม่ถูกต้อง");}};
 function miniChart(host,sym){
   const w=document.createElement("div");w.className="tradingview-widget-container";
-  const inner=document.createElement("div");inner.className="tradingview-widget-container__widget";
-  w.appendChild(inner);
+  const inner=document.createElement("div");inner.className="tradingview-widget-container__widget";w.appendChild(inner);
   const s=document.createElement("script");s.type="text/javascript";s.async=true;
   s.src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
-  s.text=JSON.stringify({symbol:sym,width:"100%",height:160,locale:"en",dateRange:"3M",colorTheme:"dark",isTransparent:true,autosize:false,chartOnly:false});
-  w.appendChild(s);host.appendChild(w);
-}
-
+  s.text=JSON.stringify({symbol:sym,width:"100%",height:170,locale:"en",dateRange:"3M",colorTheme:"dark",isTransparent:true,autosize:false});
+  w.appendChild(s);host.appendChild(w);}
 function cardFor(it){
-  const S=loadSet(),port=S.port||0,riskPct=(S.risk||0)/100;
+  const S=loadSet(),port=S.port||0,rp=(S.risk||0)/100;
   const el=document.createElement("div");el.className="item";
-  const risk = (it.stop!==null && it.entry>it.stop) ? (it.entry-it.stop) : null;
-  const rr = (risk && it.target!==null) ? ((it.target-it.entry)/risk) : null;
-  const stopPct = risk ? (risk/it.entry*100) : null;
-  const sugg = (risk && port>0) ? Math.floor((port*riskPct)/risk) : null;
-
-  let plHtml="", alerts="";
-  if(it.type==="buy" && it.qty && it.cur!==null){
-    const pl=(it.cur-it.entry)*it.qty, plp=(it.cur-it.entry)/it.entry*100;
-    plHtml=`<div class="lv"><b>กำไร/ขาดทุน</b><span class="${pl>=0?'g':'r'}">${pl>=0?'+':''}$${pl.toFixed(2)} (${plp>=0?'+':''}${plp.toFixed(1)}%)</span></div>`;
-    if(plp>=20) alerts+=`<div class="alert a-green">🎯 กำไรเกิน +20% แล้ว — ตามกฎ พิจารณาล็อกกำไรบางส่วน (1/3–1/2) และเลื่อน stop ขึ้น</div>`;
-  }
-  if(it.stop!==null && it.cur!==null && it.cur<=it.stop){
-    el.className="item brk";
-    alerts+=`<div class="alert a-red">🚨 ราคาหลุด stop ($${it.stop}) แล้ว — กฎระบบคือขายทันที ไม่ถัวขาลง</div>`;
-  }
-  if(it.type==="buy" && it.qty && risk){
-    const rAmt=risk*it.qty, rPct=port>0?(rAmt/port*100):0;
-    plHtml+=`<div class="lv"><b>เสี่ยงถ้าหลุด stop</b><span class="${rPct>(S.risk||1.5)?'r':''}">$${rAmt.toFixed(2)} (${rPct.toFixed(2)}% ของพอร์ต)</span></div>`;
-    if(rPct>(S.risk||1.5)) alerts+=`<div class="alert a-gold">⚠️ ความเสี่ยงดีลนี้ ${rPct.toFixed(2)}% เกินกฎ ${S.risk}% — ไซซ์ใหญ่ไป พิจารณาลดจำนวนหุ้นหรือขยับ stop</div>`;
-  }
-  if(it.stop===null) alerts+=`<div class="alert a-gold">⚠️ ยังไม่ได้ตั้ง stop — กฎข้อแรกคือรู้จุดตัดขาดทุนก่อนเข้าเสมอ กด ✏️ เพื่อเพิ่ม</div>`;
-
-  const cost=(it.type==="buy"&&it.qty)?` · ต้นทุนรวม $${(it.entry*it.qty).toFixed(2)}`:"";
-  el.innerHTML=`
-    <div class="ihead"><span class="tk">${it.tk}</span>
-      <span class="icons"><button data-act="chart" title="กราฟ">📈</button><button data-act="edit" title="แก้ไข">✏️</button><button data-act="del" title="ลบ">🗑</button></span></div>
-    <div class="isub">${it.type==="buy"?"💼 ซื้อที่ $"+it.entry:"👀 โซนเข้า $"+it.entry}${it.qty?" · "+it.qty+" หุ้น":""}${cost}${it.note?" · "+it.note:""}</div>
-    <div class="lvls l3">
-      <div class="lv"><b>Stop</b>${it.stop!==null?"$"+it.stop+(stopPct?` <span class="muted">(−${stopPct.toFixed(1)}%)</span>`:""):"<span class='muted'>—</span>"}</div>
-      <div class="lv"><b>เป้าหมาย</b>${it.target!==null?"$"+it.target:"<span class='muted'>—</span>"}</div>
-      <div class="lv"><b>R:R</b>${rr!==null?`<span class="${rr>=2?'g':(rr>=1?'':'r')}">1 : ${rr.toFixed(1)}</span>`:"<span class='muted'>—</span>"}</div>
-      ${it.cur!==null?`<div class="lv"><b>ราคาปัจจุบัน</b>$${it.cur}</div>`:""}
-      ${it.type==="watch"&&sugg?`<div class="lv"><b>ควรซื้อ (ตามกฎเสี่ยง)</b>${sugg} หุ้น</div>`:""}
-      ${plHtml}
-    </div>${alerts}<div class="mini" style="display:none"></div>`;
-
-  el.querySelector('[data-act="del"]').onclick=()=>{
-    if(!confirm("ลบ "+it.tk+" ?"))return;
+  const risk=(it.stop!==null&&it.entry>it.stop)?(it.entry-it.stop):null;
+  const rr=(risk&&it.target!==null)?((it.target-it.entry)/risk):null;
+  const stopPct=risk?(risk/it.entry*100):null;
+  const sugg=(risk&&port>0)?Math.floor((port*rp)/risk):null;
+  let extra="",alerts="";
+  const db=STOCKS.find(x=>x.tk===it.tk);
+  if(it.type==="buy"&&it.qty&&it.cur!==null){
+    const pl=(it.cur-it.entry)*it.qty,plp=(it.cur-it.entry)/it.entry*100;
+    extra=`<div class="lv"><b>กำไร/ขาดทุน</b><span class="${pl>=0?'g':'r'}">${pl>=0?'+':''}$${pl.toFixed(2)} (${pct(plp)})</span></div>`;
+    if(plp>=20)alerts+=`<div class="alert a-good">🎯 กำไรเกิน +20% — ตามกฎ พิจารณาล็อกกำไรบางส่วนและเลื่อน stop ขึ้น</div>`;}
+  if(it.stop!==null&&it.cur!==null&&it.cur<=it.stop){el.className="item brk";
+    alerts+=`<div class="alert a-crit">🚨 ราคาหลุด stop (${money(it.stop)}) — กฎระบบคือขายทันที ไม่ถัวขาลง</div>`;}
+  if(it.type==="buy"&&it.qty&&risk){const rA=risk*it.qty,rP=port>0?(rA/port*100):0;
+    extra+=`<div class="lv"><b>เสี่ยงถ้าหลุด stop</b><span class="${rP>(S.risk||1.5)?'r':''}">$${rA.toFixed(2)} (${rP.toFixed(2)}%)</span></div>`;
+    if(rP>(S.risk||1.5))alerts+=`<div class="alert a-warn">⚠️ ความเสี่ยงดีลนี้ ${rP.toFixed(2)}% เกินกฎ ${S.risk}% — ไซซ์ใหญ่ไป</div>`;}
+  if(it.stop===null)alerts+=`<div class="alert a-warn">⚠️ ยังไม่ตั้ง stop — กฎข้อแรกคือรู้จุดตัดขาดทุนก่อนเข้า</div>`;
+  if(db){const sg=signalOf(db);
+    alerts+=`<div class="alert" style="background:var(--card3);color:var(--mut)">📊 ฐานข้อมูล: ${sg.ic} ${sg.tx} · ราคาเหมาะสม ${money(db.fl)}–${money(db.fh)} <a href="#detail" onclick="selectStock('${db.tk}');return false;">ดูบทวิเคราะห์</a></div>`;}
+  const cost=(it.type==="buy"&&it.qty)?` · ต้นทุน $${(it.entry*it.qty).toFixed(2)}`:"";
+  el.innerHTML=`<div class="ihead"><span class="tk">${it.tk}</span>
+      <span class="icons"><button data-act="chart">📈</button><button data-act="edit">✏️</button><button data-act="del">🗑</button></span></div>
+    <div class="isub">${it.type==="buy"?"💼 ซื้อที่ "+money(it.entry):"👀 โซนเข้า "+money(it.entry)}${it.qty?" · "+it.qty+" หุ้น":""}${cost}${it.note?" · "+it.note:""}</div>
+    <div class="lvls">
+      <div class="lv"><b>Stop</b>${it.stop!==null?money(it.stop)+(stopPct?` <span class="dim">(−${stopPct.toFixed(1)}%)</span>`:""):"—"}</div>
+      <div class="lv"><b>เป้าหมาย</b>${it.target!==null?money(it.target):"—"}</div>
+      <div class="lv"><b>R:R</b>${rr!==null?`<span style="color:${rr>=2?'#3ec93e':(rr>=1?'inherit':'#f06a6a')}">1 : ${rr.toFixed(1)}</span>`:"—"}</div>
+      ${it.cur!==null?`<div class="lv"><b>ราคาปัจจุบัน</b>${money(it.cur)}</div>`:""}
+      ${it.type==="watch"&&sugg?`<div class="lv"><b>ควรซื้อ</b>${sugg} หุ้น</div>`:""}
+      ${extra}</div>${alerts}<div class="mini" style="display:none"></div>`;
+  el.querySelector('[data-act="del"]').onclick=()=>{if(!confirm("ลบ "+it.tk+" ?"))return;
     saveItems(loadItems().filter(x=>x.id!==it.id));render();};
-  el.querySelector('[data-act="edit"]').onclick=()=>{
-    setMode(it.type);editId=it.id;
-    $("f_ticker").value=it.tk;$("f_entry").value=it.entry;
-    $("f_qty").value=it.qty??"";$("f_stop").value=it.stop??"";
-    $("f_target").value=it.target??"";$("f_cur").value=it.cur??"";$("f_note").value=it.note||"";
-    $("btnSave").textContent="อัปเดตรายการ";$("btnCancel").style.display="";
-    window.scrollTo({top:0,behavior:"smooth"});};
+  el.querySelector('[data-act="edit"]').onclick=()=>{setMode(it.type);editId=it.id;
+    $("f_ticker").value=it.tk;$("f_entry").value=it.entry;$("f_qty").value=it.qty??"";
+    $("f_stop").value=it.stop??"";$("f_target").value=it.target??"";$("f_cur").value=it.cur??"";
+    $("f_note").value=it.note||"";$("btnSave").textContent="อัปเดตรายการ";$("btnCancel").style.display="";
+    $("btnSave").scrollIntoView({behavior:"smooth",block:"center"});};
   const mh=el.querySelector(".mini");
   el.querySelector('[data-act="chart"]').onclick=()=>{
     if(mh.style.display==="none"){mh.style.display="";if(!mh.dataset.done){miniChart(mh,it.tk);mh.dataset.done="1";}}
     else mh.style.display="none";};
-  return el;
-}
-
+  return el;}
 function render(){
-  const items=loadItems();
-  const b=items.filter(x=>x.type==="buy"),w=items.filter(x=>x.type==="watch");
-  const lb=$("listBuy"),lw=$("listWatch");
-  lb.innerHTML="";lw.innerHTML="";
-  b.forEach(it=>lb.appendChild(cardFor(it)));
-  w.forEach(it=>lw.appendChild(cardFor(it)));
-  $("emptyBuy").style.display=b.length?"none":"block";
-  $("emptyWatch").style.display=w.length?"none":"block";
-  $("cntBuy").textContent=b.length?`(${b.length})`:"";
-  $("cntWatch").textContent=w.length?`(${w.length})`:"";
-}
-setMode("buy");render();
+  const items=loadItems(),b=items.filter(x=>x.type==="buy"),w=items.filter(x=>x.type==="watch");
+  const lb=$("listBuy"),lw=$("listWatch");lb.innerHTML="";lw.innerHTML="";
+  b.forEach(it=>lb.appendChild(cardFor(it)));w.forEach(it=>lw.appendChild(cardFor(it)));
+  $("emptyBuy").style.display=b.length?"none":"block";$("emptyWatch").style.display=w.length?"none":"block";
+  $("cntBuy").textContent=b.length?`(${b.length})`:"";$("cntWatch").textContent=w.length?`(${w.length})`:"";}
+
+/* ============ init ============ */
+$("q").addEventListener("input",e=>renderChips(e.target.value));
+setMode("buy");renderChips("");renderRank();render();selectStock("NVDA");
 </script>
 </body>
 </html>
