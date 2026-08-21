@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio — Live</title>
+<style>
+  :root{
+    --bg:#0d0d12; --card:#16161f; --card2:#1c1c28; --line:#2a2a3a;
+    --tx:#f2f2f7; --mut:#9a9ab0; --accent:#7c5cff; --accent2:#a78bfa;
+    --green:#26c281; --red:#ff5c7a; --gold:#d9c26a; --blue:#5b9bff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:14px;max-width:860px;margin:0 auto;-webkit-font-smoothing:antialiased}
+  h1{font-size:19px;font-weight:700}
+  .sub{color:var(--mut);font-size:12px;margin-bottom:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+  .hero{background:linear-gradient(145deg,#1e1a3a,#16161f);text-align:center;padding:20px 16px}
+  .hero .big{font-size:32px;font-weight:800;letter-spacing:-.5px}
+  .hero .baht{color:var(--mut);font-size:13px;margin-top:2px}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-weight:700;font-size:14px;margin-top:8px}
+  .up{color:var(--green);background:rgba(38,194,129,.12)}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .sec-title{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+  .widget-box{height:520px}
+  .chart-box{height:420px}
+  .tv-note{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.5}
+  .row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .row:last-child{margin-bottom:0}
+  .lbl{width:100px;font-size:13px;flex-shrink:0}
+  .bar-wrap{flex:1;background:var(--card2);border-radius:6px;height:22px;position:relative;overflow:hidden}
+  .bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+  .val{width:52px;text-align:right;font-size:12px;font-weight:700;flex-shrink:0}
+  .cap-line{position:absolute;top:0;bottom:0;width:2px;background:var(--red);opacity:.8}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat{background:var(--card2);border-radius:12px;padding:12px}
+  .stat .k{font-size:11px;color:var(--mut)}
+  .stat .v{font-size:16px;font-weight:800;margin-top:3px}
+  .g{color:var(--green)} .r{color:var(--red)}
+  .action{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+  .action:last-child{border-bottom:none}
+  .num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .action .t{font-size:13px;line-height:1.45}
+  .tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;margin-left:4px}
+  .t-cut{background:rgba(255,92,122,.15);color:var(--red)}
+  .t-trim{background:rgba(217,194,106,.18);color:var(--gold)}
+  .t-hold{background:rgba(38,194,129,.15);color:var(--green)}
+  .legend{font-size:11.5px;color:var(--mut);line-height:1.7;margin-top:4px}
+  .muted{color:var(--mut)}
+  .disc{font-size:10.5px;color:var(--mut);line-height:1.6;text-align:center;margin-top:6px}
+  a{color:var(--accent2)}
+  /* ---- form ---- */
+  .seg{display:flex;gap:8px;margin-bottom:12px}
+  .seg button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--mut);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer}
+  .seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+  .fgrid.f3{grid-template-columns:1fr 1fr 1fr}
+  .fld label{display:block;font-size:10.5px;color:var(--mut);margin-bottom:3px;font-weight:600}
+  .fld input{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--tx);padding:10px;font-size:14px}
+  .fld input::placeholder{color:#5c5c72}
+  #f_ticker{text-transform:uppercase}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:14.5px;width:100%;cursor:pointer}
+  .btn.ghost{background:var(--card2);border:1px solid var(--line);color:var(--mut);font-size:12px;padding:9px}
+  .btnrow{display:flex;gap:8px;margin-top:8px}
+  /* ---- item cards ---- */
+  .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card2)}
+  .item.brk{border-color:rgba(255,92,122,.55)}
+  .ihead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:3px}
+  .ihead .tk{font-size:16px;font-weight:800}
+  .isub{font-size:11.5px;color:var(--mut);margin-bottom:9px}
+  .lvls{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
+  .lvls.l3{grid-template-columns:1fr 1fr 1fr}
+  .lv{background:var(--card);border-radius:8px;padding:7px 9px}
+  .lv b{display:block;font-size:10px;color:var(--mut);font-weight:600;margin-bottom:1px}
+  .alert{margin-top:8px;font-size:11.5px;font-weight:700;padding:7px 9px;border-radius:8px;line-height:1.5}
+  .a-red{background:rgba(255,92,122,.13);color:var(--red)}
+  .a-gold{background:rgba(217,194,106,.13);color:var(--gold)}
+  .a-green{background:rgba(38,194,129,.12);color:var(--green)}
+  .mini{margin-top:9px}
+  .icons{display:flex;gap:6px;flex-shrink:0}
+  .icons button{background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:7px;width:29px;height:27px;font-size:13px;cursor:pointer;line-height:1}
+  .empty{color:var(--mut);font-size:12px;text-align:center;padding:16px 0;line-height:1.6}
+  .st{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
+  .s-go{background:rgba(38,194,129,.15);color:var(--green)}
+  .s-wait{background:rgba(217,194,106,.18);color:var(--gold)}
+  .s-no{background:rgba(255,92,122,.15);color:var(--red)}
+  .idea{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:11px;background:var(--card2)}
+  .idea h3{font-size:15px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .idea .px{font-size:12px;color:var(--mut);margin-bottom:7px}
+  .idea .news{font-size:12px;line-height:1.5;margin-bottom:9px}
+  .scorechip{font-size:10px;color:var(--mut);margin-bottom:8px}
+  @media(max-width:430px){.lbl{width:82px}.hero .big{font-size:28px}.widget-box{height:480px}.fgrid.f3{grid-template-columns:1fr 1fr}.lvls.l3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+  <h1>📊 พอร์ทของฉัน — Live</h1>
+  <div class="sub"><span class="live-dot"></span>ราคาสดจาก TradingView (อัปเดตเองตลอดเวลาที่เปิดหน้านี้) · ฐานพอร์ท 20 ส.ค. 2026</div>
+
+  <div class="card" style="padding:6px">
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+      {"symbols":[
+        {"proName":"FOREXCOM:SPXUSD","title":"S&P 500"},
+        {"proName":"NASDAQ:NVDA","title":"NVDA"},
+        {"proName":"NASDAQ:MU","title":"MU"},
+        {"proName":"NASDAQ:ASML","title":"ASML"},
+        {"proName":"NASDAQ:AMZN","title":"AMZN"},
+        {"proName":"NASDAQ:TSLA","title":"TSLA"},
+        {"proName":"NASDAQ:RKLB","title":"RKLB"},
+        {"proName":"AMEX:GLD","title":"GLD"}
+      ],"showSymbolLogo":true,"isTransparent":true,"displayMode":"adaptive","colorTheme":"dark","locale":"en"}
+      </script>
+    </div>
+  </div>
+
+  <div class="card hero">
+    <div class="baht">มูลค่าสินทรัพย์ทั้งหมด (ฐาน 20 ส.ค. 2026)</div>
+    <div class="big">$1,543.61</div>
+    <div class="baht">≈ 50,630 บาท · หุ้น 74.25% · ETF 13.03% · ADR 12.72%</div>
+    <div class="pill up">↗ +17.42%</div>
+  </div>
+
+  <div class="grid2">
+    <div class="stat"><div class="k">🏆 ตัวนำ</div><div class="v g">ASML +126.6%</div><div class="muted">ADR · $196.35</div></div>
+    <div class="stat"><div class="k">⚠️ ตัวถ่วง</div><div class="v r">SPCX −39.8% · MP −20.8%</div><div class="muted">ทบทวน thesis</div></div>
+  </div>
+
+  <!-- ============ ADD / MANAGE ============ -->
+  <div class="card">
+    <div class="sec-title">➕ เพิ่มหุ้นของฉัน (ไม่จำกัดจำนวน)</div>
+    <div class="seg">
+      <button id="segBuy" class="on">💼 ซื้อแล้ว</button>
+      <button id="segWatch">👀 แค่เฝ้าดู</button>
+    </div>
+    <div class="fgrid">
+      <div class="fld"><label>ชื่อย่อหุ้น *</label><input id="f_ticker" placeholder="NVDA หรือ NASDAQ:NVDA" maxlength="24"></div>
+      <div class="fld"><label id="lb_entry">ราคาที่ซื้อ *</label><input id="f_entry" type="number" step="any" placeholder="0.00"></div>
+    </div>
+    <div class="fgrid f3">
+      <div class="fld" id="wrap_qty"><label>จำนวนหุ้น</label><input id="f_qty" type="number" step="any" placeholder="เช่น 5"></div>
+      <div class="fld"><label>ราคา Stop (ตัดขาดทุน)</label><input id="f_stop" type="number" step="any" placeholder="0.00"></div>
+      <div class="fld"><label>ราคาเป้าหมาย</label><input id="f_target" type="number" step="any" placeholder="0.00"></div>
+    </div>
+    <div class="fgrid">
+      <div class="fld"><label>ราคาปัจจุบัน (ใส่เองเพื่อคำนวณกำไร)</label><input id="f_cur" type="number" step="any" placeholder="ดูจากกราฟสด"></div>
+      <div class="fld"><label>โน้ต / เหตุผลที่เข้า</label><input id="f_note" placeholder="เช่น งบดี เบรกแนวต้าน" maxlength="80"></div>
+    </div>
+    <button class="btn" id="btnSave">บันทึกเข้ารายการ</button>
+    <div class="btnrow">
+      <button class="btn ghost" id="btnCancel" style="display:none">ยกเลิกการแก้ไข</button>
+      <button class="btn ghost" id="btnExport">📋 สำรองข้อมูล</button>
+      <button class="btn ghost" id="btnImport">📥 กู้คืน</button>
+    </div>
+    <div class="tv-note">ข้อมูลบันทึกในเบราว์เซอร์เครื่องนี้ (ไม่ส่งขึ้นเน็ต ไม่มีใครเห็น) · ใส่ Stop กับเป้า เพื่อให้ระบบคำนวณความเสี่ยง/ผลตอบแทนและเตือนเมื่อหลุด stop</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">⚙️ ตั้งค่าความเสี่ยง</div>
+    <div class="fgrid">
+      <div class="fld"><label>มูลค่าพอร์ตรวม (USD)</label><input id="s_port" type="number" step="any" value="1543.61"></div>
+      <div class="fld"><label>เสี่ยงต่อดีล (% ของพอร์ต)</label><input id="s_risk" type="number" step="any" value="1.5"></div>
+    </div>
+    <div class="legend">ใช้คำนวณ “จำนวนหุ้นที่ควรซื้อ” = (พอร์ต × %เสี่ยง) ÷ (ราคาเข้า − stop) ตามกฎในคู่มือ</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">💼 หุ้นที่ซื้อแล้ว <span id="cntBuy" class="muted"></span></div>
+    <div id="listBuy"></div>
+    <div id="emptyBuy" class="empty">ยังไม่มีรายการ — กรอกแบบฟอร์มด้านบน เลือก “💼 ซื้อแล้ว”<br>ระบบจะคำนวณกำไร/ขาดทุน ความเสี่ยง และเตือนเมื่อราคาหลุด stop</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">👀 หุ้นที่เฝ้าดู <span id="cntWatch" class="muted"></span></div>
+    <div id="listWatch"></div>
+    <div id="emptyWatch" class="empty">ยังไม่มีรายการ — กรอกแบบฟอร์มด้านบน เลือก “👀 แค่เฝ้าดู”<br>ระบบจะบอกโซนเข้า จำนวนหุ้นที่ควรซื้อ และ R:R ให้</div>
+  </div>
+
+  <!-- ============ SYSTEM IDEAS ============ -->
+  <div class="card">
+    <div class="sec-title">💡 แนะนำจากระบบ — เทคนิค + VI (ข้อมูล 19 ส.ค. 2026)</div>
+    <div id="ideas"></div>
+    <div class="tv-note">คะแนน VI (เต็ม 6) และเทคนิค (เต็ม 5) ประเมินตามเกณฑ์ในคู่มือ · ตัวเลขราคาเป็นระดับอ้างอิง ณ 19 ส.ค. ไม่ใช่คำสั่งซื้อ — ยืนยันกับกราฟสดก่อนเสมอ</div>
+  </div>
+
+  <!-- ============ LIVE WIDGETS ============ -->
+  <div class="card">
+    <div class="sec-title">🟢 ราคาสด — Watchlist พอร์ท ตามกลุ่ม</div>
+    <div class="widget-box">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+        {"colorTheme":"dark","dateRange":"3M","showChart":true,"locale":"en","width":"100%","height":"100%","isTransparent":true,"showSymbolLogo":true,"showFloatingTooltip":true,
+        "tabs":[
+          {"title":"Tech","originalTitle":"Tech","symbols":[
+            {"s":"NASDAQ:MU","d":"Micron"},{"s":"NASDAQ:MSFT","d":"Microsoft"},{"s":"NASDAQ:SNPS","d":"Synopsys"},{"s":"NASDAQ:AAPL","d":"Apple"},{"s":"NASDAQ:NVDA","d":"Nvidia"},{"s":"NYSE:RBRK","d":"Rubrik"},{"s":"NYSE:CACI","d":"CACI"},{"s":"NASDAQ:ASML","d":"ASML"}]},
+          {"title":"Fin","originalTitle":"Fin","symbols":[
+            {"s":"NYSE:BAC","d":"Bank of America"},{"s":"NASDAQ:NDAQ","d":"Nasdaq"},{"s":"NYSE:SPGI","d":"S&P Global"},{"s":"NYSE:BRK.B","d":"Berkshire"},{"s":"NASDAQ:SOFI","d":"SoFi"}]},
+          {"title":"Ind","originalTitle":"Ind","symbols":[
+            {"s":"NASDAQ:RKLB","d":"Rocket Lab"},{"s":"NASDAQ:AVAV","d":"AeroVironment"},{"s":"NASDAQ:AAON","d":"AAON"},{"s":"NASDAQ:ESLT","d":"Elbit"},{"s":"NASDAQ:EOSE","d":"Eos"}]},
+          {"title":"อื่นๆ","originalTitle":"Other","symbols":[
+            {"s":"NASDAQ:AMZN","d":"Amazon"},{"s":"NASDAQ:TSLA","d":"Tesla"},{"s":"NYSE:MP","d":"MP Materials"},{"s":"NYSE:GEV","d":"GE Vernova"},{"s":"NYSE:DX","d":"Dynex"},{"s":"NYSE:O","d":"Realty Income"},{"s":"AMEX:GLD","d":"Gold ETF"},{"s":"NASDAQ:SGOV","d":"T-Bill ETF"}]}
+        ]}
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">📈 กราฟสด (เปลี่ยนหุ้นได้ + มี EMA)</div>
+    <div class="chart-box">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        {"autosize":true,"symbol":"NASDAQ:NVDA","interval":"D","timezone":"Asia/Bangkok","theme":"dark","style":"1","locale":"en","allow_symbol_change":true,"hide_side_toolbar":false,"studies":["STD;EMA"],"support_host":"https://www.tradingview.com"}
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">สัดส่วนตามกลุ่ม (ในส่วนหุ้น · เพดาน 40%)</div>
+    <div id="sectors"></div>
+    <div class="legend">เส้นแดง = เพดาน 40% · <span class="r">Technology 44.9% เกินเพดาน</span> และถ้ารวม ASML (semis) ยิ่งกระจุกในธีมชิป/AI</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">แผนปรับพอร์ท (Rebalance)</div>
+    <div class="action"><div class="num">1</div><div class="t"><b>SPCX −39.8% · MP −20.8% · GEV −14.2%</b> <span class="tag t-cut">ทบทวน/CUT</span><br><span class="muted">ตัวขาดทุนหนัก เช็ก thesis ถ้าเสียแล้วตัดตามระบบ ไม่ถัวขาลง</span></div></div>
+    <div class="action"><div class="num">2</div><div class="t"><b>ASML +126% · RKLB +60% · GLD +55% · BAC +52%</b> <span class="tag t-trim">ล็อกกำไร</span><br><span class="muted">ASML โตจนเป็น 12.7% ของพอร์ท พิจารณาล็อกกำไรบางส่วน</span></div></div>
+    <div class="action"><div class="num">3</div><div class="t"><b>Tech + ASML</b> <span class="tag t-trim">ลดกระจุกชิป/AI</span><br><span class="muted">คุมไม่ให้ธีมเดียวหนักเกินไป กระจายความเสี่ยง</span></div></div>
+    <div class="action"><div class="num">4</div><div class="t"><b>เงินสด/SGOV</b> <span class="tag t-hold">กันไว้ 10–15%</span><br><span class="muted">รอ setup ใหม่ + จับตา Fed (กระทบ DX/O/GLD)</span></div></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">กติกาเข้าเร็ว (Quick Rules)</div>
+    <div class="legend">
+      <b>ก่อนซื้อ:</b> VI ≥ 4/6 · เทคนิค ≥ 3/5 · มี catalyst · ตั้ง stop เสี่ยง ≤ 1.5% ของพอร์ท<br>
+      <b>Gap:</b> ไม่ไล่ราคา gap ขึ้น &gt;15% ในวันเดียว · รอย่อ/ยืนเหนือ gap 1–2 วัน<br>
+      <b>ขาย:</b> หลุด stop = ขายทันที ไม่ถัวขาลง · ล็อกกำไรบางส่วนที่ +20–25%<br>
+      <b>สั้น vs ยาว:</b> สั้น=เล่นรอบตามเทคนิค/gap (stop แน่น) · ยาว=VI ถือข้ามรอบ ทบทวนทุกไตรมาส
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--card2)">
+    <div class="sec-title">🔔 ระบบข่าวอัตโนมัติ</div>
+    <div class="legend">สแกนข่าว/งบ/เทรนด์ ทุกเช้าวันทำการ (≈07:00 น. ไทย) เน้นกลุ่ม Tech + แนะนำหุ้นพร้อมโซนเข้า/stop/เป้า ส่งเข้าแอป Claude บนมือถือ</div>
+  </div>
+
+  <div class="disc">⚠️ เพื่อการศึกษา ไม่ใช่คำแนะนำการลงทุนเฉพาะบุคคล · ราคาจาก TradingView อาจดีเลย์ตามสิทธิ์ฟรี · ตรวจสอบข้อมูลล่าสุดก่อนตัดสินใจเสมอ</div>
+
+<script>
+/* ================= sector bars ================= */
+const sectors=[
+  {n:"Technology",v:44.93,c:"#7c5cff"},{n:"Financials",v:19.36,c:"#5b9bff"},
+  {n:"Industrials",v:14.62,c:"#d9c26a"},{n:"Real Estate",v:10.59,c:"#e26fa0"},
+  {n:"Cons. Disc.",v:7.18,c:"#4fc3a1"},{n:"Materials",v:2.85,c:"#c8803a"},{n:"Utilities",v:0.47,c:"#8a7dd6"}];
+const CAP=40,maxv=Math.max(...sectors.map(s=>s.v),CAP);
+const scEl=document.getElementById("sectors");
+sectors.forEach(s=>{const o=s.v>CAP;const d=document.createElement("div");d.className="row";
+  d.innerHTML=`<div class="lbl">${s.n}</div><div class="bar-wrap"><div class="bar" style="width:${(s.v/maxv*100).toFixed(1)}%;background:${s.c}">${s.v}%</div><div class="cap-line" style="left:${(CAP/maxv*100).toFixed(1)}%"></div></div><div class="val" style="color:${o?'var(--red)':'var(--tx)'}">${s.v}%</div>`;
+  scEl.appendChild(d);});
+
+/* ================= system ideas ================= */
+const ideas=[
+ {tk:"PLTR",name:"Palantir",px:"$175.19 (+2.1%)",st:"🟢 เข้าเกณฑ์",cls:"s-go",vi:5,te:5,
+  news:"งบ Q2 beat · อยู่ในเทรนด์ขาขึ้นแข็ง แนวรับวอลุ่ม $172",
+  entry:"ย่อ $172 ไม่หลุด / เบรก >$179",stop:"$162 (−7.5%)",tgt:"$190 (+8–12%)",long:"Growth สูง แต่ valuation แพงมาก → เป็น Satellite ไซซ์เล็ก คุมความเสี่ยง"},
+ {tk:"NVDA",name:"Nvidia",px:"$217.56",st:"🟡 รอผลงบ",cls:"s-wait",vi:6,te:3,
+  news:"ผู้นำชิป AI · ประกาศงบ ~26 ส.ค. (event risk สูง) ราคาแกว่งใกล้แนวรับวอลุ่ม $211",
+  entry:"$211–217 (แนวรับ)",stop:"$205 (−5.7%)",tgt:"$232 (+6–10%)",long:"พื้นฐานแกร่งสุดในกลุ่ม เหมาะเป็น Core ถือยาว · ก่อนงบควรไม้เล็ก หรือรอยืนหลังงบ"},
+ {tk:"MU",name:"Micron (ถืออยู่)",px:"$937.11",st:"🟡 รอ base",cls:"s-wait",vi:5,te:2,
+  news:"HBM/AI memory sold-out (ธีมแข็ง) แต่เทรนด์สั้นย่อ · แนวต้าน $954/$1,048 แนวรับ $920",
+  entry:"เบรก >$955 ยืนได้ / รับ $920",stop:"$890 (−5%)",tgt:"$1,048 (+12%)",long:"Core ธีม memory supercycle · ผันผวนแรงมาก ต้องคุมไซซ์"},
+ {tk:"AMD",name:"AMD",px:"$466.42 (−3.7%)",st:"🔴 รอ ยังลง",cls:"s-no",vi:4,te:1,
+  news:"เทคนิคเป็น Sell candidate เทรนด์สั้นลง · ยังไม่ควรเข้า รอฐานใหม่",
+  entry:"รอยืนเหนือ $482 + วอลุ่ม",stop:"$455",tgt:"$520 (หลังเบรก)",long:"พื้นฐานพอใช้ แต่เทคนิคไม่ผ่านเกณฑ์ → อยู่ watchlist ก่อน"},
+ {tk:"AVGO",name:"Broadcom",px:"$362.48 (−4.6%)",st:"🔴 รอ ลงแรง",cls:"s-no",vi:5,te:1,
+  news:"−13% ใน 10 วัน · Strong Sell เทคนิค เทรนด์ลง · ห้ามรีบรับมีด",
+  entry:"รอยืนเหนือ $382",stop:"$348",tgt:"$400+ (หลังเสถียร)",long:"VI ดี (กระแสเงินสดแกร่ง) แต่ต้องรอจังหวะเทคนิคกลับตัว"}];
+const ideaBox=document.getElementById("ideas");
+ideas.forEach(i=>{const d=document.createElement("div");d.className="idea";
+  d.innerHTML=`<h3><span>${i.tk}</span><span class="st ${i.cls}">${i.st}</span></h3>
+    <div class="px">${i.name} · ${i.px}</div>
+    <div class="scorechip">VI <b style="color:${i.vi>=4?'var(--green)':'var(--gold)'}">${i.vi}/6</b> · เทคนิค <b style="color:${i.te>=3?'var(--green)':'var(--red)'}">${i.te}/5</b></div>
+    <div class="news">📰 ${i.news}</div>
+    <div class="lvls"><div class="lv"><b>โซนเข้า</b>${i.entry}</div><div class="lv"><b>Stop</b>${i.stop}</div>
+    <div class="lv"><b>เป้าสั้น</b>${i.tgt}</div><div class="lv"><b>มุมมองยาว</b>${i.long}</div></div>`;
+  ideaBox.appendChild(d);});
+
+/* ================= my stocks manager ================= */
+const K_ITEMS="pf_items_v1",K_SET="pf_set_v1";
+let mode="buy",editId=null;
+const $=id=>document.getElementById(id);
+function loadItems(){try{return JSON.parse(localStorage.getItem(K_ITEMS))||[]}catch(e){return[]}}
+function saveItems(a){try{localStorage.setItem(K_ITEMS,JSON.stringify(a))}catch(e){alert("บันทึกไม่ได้ (พื้นที่เต็มหรือโหมดส่วนตัว)")}}
+function loadSet(){try{return JSON.parse(localStorage.getItem(K_SET))||{port:1543.61,risk:1.5}}catch(e){return{port:1543.61,risk:1.5}}}
+function saveSet(){const s={port:parseFloat($("s_port").value)||0,risk:parseFloat($("s_risk").value)||0};
+  try{localStorage.setItem(K_SET,JSON.stringify(s))}catch(e){} render();}
+const st0=loadSet();$("s_port").value=st0.port;$("s_risk").value=st0.risk;
+$("s_port").addEventListener("change",saveSet);$("s_risk").addEventListener("change",saveSet);
+
+function setMode(m){mode=m;
+  $("segBuy").classList.toggle("on",m==="buy");
+  $("segWatch").classList.toggle("on",m==="watch");
+  $("lb_entry").textContent = m==="buy" ? "ราคาที่ซื้อ *" : "ราคาที่อยากเข้า *";
+  $("wrap_qty").style.display = m==="buy" ? "" : "none";
+}
+$("segBuy").onclick=()=>setMode("buy");
+$("segWatch").onclick=()=>setMode("watch");
+
+function num(v){const n=parseFloat(v);return isFinite(n)?n:null}
+function clearForm(){["f_ticker","f_entry","f_qty","f_stop","f_target","f_cur","f_note"].forEach(i=>$(i).value="");
+  editId=null;$("btnSave").textContent="บันทึกเข้ารายการ";$("btnCancel").style.display="none";}
+
+$("btnSave").onclick=()=>{
+  const tk=($("f_ticker").value||"").trim().toUpperCase().replace(/\s+/g,"");
+  const entry=num($("f_entry").value);
+  if(!tk){alert("กรุณาใส่ชื่อย่อหุ้น");return}
+  if(entry===null||entry<=0){alert("กรุณาใส่ราคา (ตัวเลขมากกว่า 0)");return}
+  const it={id:editId||("i"+Date.now()+Math.floor(Math.random()*999)),type:mode,tk:tk,entry:entry,
+    qty:num($("f_qty").value),stop:num($("f_stop").value),target:num($("f_target").value),
+    cur:num($("f_cur").value),note:($("f_note").value||"").trim()};
+  const a=loadItems();
+  if(editId){const ix=a.findIndex(x=>x.id===editId); if(ix>=0)a[ix]=it; else a.push(it);}
+  else a.push(it);
+  saveItems(a);clearForm();render();
+};
+$("btnCancel").onclick=()=>{clearForm();};
+
+$("btnExport").onclick=()=>{
+  const data=JSON.stringify({items:loadItems(),set:loadSet()});
+  const ta=document.createElement("textarea");ta.value=data;document.body.appendChild(ta);
+  ta.select();
+  try{document.execCommand("copy");alert("คัดลอกข้อมูลสำรองแล้ว — เก็บข้อความนี้ไว้ในโน้ต");}
+  catch(e){prompt("คัดลอกข้อความนี้เก็บไว้:",data);}
+  document.body.removeChild(ta);
+};
+$("btnImport").onclick=()=>{
+  const s=prompt("วางข้อมูลสำรองที่นี่:");
+  if(!s)return;
+  try{const o=JSON.parse(s);
+    if(o.items)saveItems(o.items);
+    if(o.set){localStorage.setItem(K_SET,JSON.stringify(o.set));$("s_port").value=o.set.port;$("s_risk").value=o.set.risk;}
+    render();alert("กู้คืนสำเร็จ");}
+  catch(e){alert("ข้อมูลไม่ถูกต้อง");}
+};
+
+function miniChart(host,sym){
+  const w=document.createElement("div");w.className="tradingview-widget-container";
+  const inner=document.createElement("div");inner.className="tradingview-widget-container__widget";
+  w.appendChild(inner);
+  const s=document.createElement("script");s.type="text/javascript";s.async=true;
+  s.src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
+  s.text=JSON.stringify({symbol:sym,width:"100%",height:160,locale:"en",dateRange:"3M",colorTheme:"dark",isTransparent:true,autosize:false,chartOnly:false});
+  w.appendChild(s);host.appendChild(w);
+}
+
+function cardFor(it){
+  const S=loadSet(),port=S.port||0,riskPct=(S.risk||0)/100;
+  const el=document.createElement("div");el.className="item";
+  const risk = (it.stop!==null && it.entry>it.stop) ? (it.entry-it.stop) : null;
+  const rr = (risk && it.target!==null) ? ((it.target-it.entry)/risk) : null;
+  const stopPct = risk ? (risk/it.entry*100) : null;
+  const sugg = (risk && port>0) ? Math.floor((port*riskPct)/risk) : null;
+
+  let plHtml="", alerts="";
+  if(it.type==="buy" && it.qty && it.cur!==null){
+    const pl=(it.cur-it.entry)*it.qty, plp=(it.cur-it.entry)/it.entry*100;
+    plHtml=`<div class="lv"><b>กำไร/ขาดทุน</b><span class="${pl>=0?'g':'r'}">${pl>=0?'+':''}$${pl.toFixed(2)} (${plp>=0?'+':''}${plp.toFixed(1)}%)</span></div>`;
+    if(plp>=20) alerts+=`<div class="alert a-green">🎯 กำไรเกิน +20% แล้ว — ตามกฎ พิจารณาล็อกกำไรบางส่วน (1/3–1/2) และเลื่อน stop ขึ้น</div>`;
+  }
+  if(it.stop!==null && it.cur!==null && it.cur<=it.stop){
+    el.className="item brk";
+    alerts+=`<div class="alert a-red">🚨 ราคาหลุด stop ($${it.stop}) แล้ว — กฎระบบคือขายทันที ไม่ถัวขาลง</div>`;
+  }
+  if(it.type==="buy" && it.qty && risk){
+    const rAmt=risk*it.qty, rPct=port>0?(rAmt/port*100):0;
+    plHtml+=`<div class="lv"><b>เสี่ยงถ้าหลุด stop</b><span class="${rPct>(S.risk||1.5)?'r':''}">$${rAmt.toFixed(2)} (${rPct.toFixed(2)}% ของพอร์ต)</span></div>`;
+    if(rPct>(S.risk||1.5)) alerts+=`<div class="alert a-gold">⚠️ ความเสี่ยงดีลนี้ ${rPct.toFixed(2)}% เกินกฎ ${S.risk}% — ไซซ์ใหญ่ไป พิจารณาลดจำนวนหุ้นหรือขยับ stop</div>`;
+  }
+  if(it.stop===null) alerts+=`<div class="alert a-gold">⚠️ ยังไม่ได้ตั้ง stop — กฎข้อแรกคือรู้จุดตัดขาดทุนก่อนเข้าเสมอ กด ✏️ เพื่อเพิ่ม</div>`;
+
+  const cost=(it.type==="buy"&&it.qty)?` · ต้นทุนรวม $${(it.entry*it.qty).toFixed(2)}`:"";
+  el.innerHTML=`
+    <div class="ihead"><span class="tk">${it.tk}</span>
+      <span class="icons"><button data-act="chart" title="กราฟ">📈</button><button data-act="edit" title="แก้ไข">✏️</button><button data-act="del" title="ลบ">🗑</button></span></div>
+    <div class="isub">${it.type==="buy"?"💼 ซื้อที่ $"+it.entry:"👀 โซนเข้า $"+it.entry}${it.qty?" · "+it.qty+" หุ้น":""}${cost}${it.note?" · "+it.note:""}</div>
+    <div class="lvls l3">
+      <div class="lv"><b>Stop</b>${it.stop!==null?"$"+it.stop+(stopPct?` <span class="muted">(−${stopPct.toFixed(1)}%)</span>`:""):"<span class='muted'>—</span>"}</div>
+      <div class="lv"><b>เป้าหมาย</b>${it.target!==null?"$"+it.target:"<span class='muted'>—</span>"}</div>
+      <div class="lv"><b>R:R</b>${rr!==null?`<span class="${rr>=2?'g':(rr>=1?'':'r')}">1 : ${rr.toFixed(1)}</span>`:"<span class='muted'>—</span>"}</div>
+      ${it.cur!==null?`<div class="lv"><b>ราคาปัจจุบัน</b>$${it.cur}</div>`:""}
+      ${it.type==="watch"&&sugg?`<div class="lv"><b>ควรซื้อ (ตามกฎเสี่ยง)</b>${sugg} หุ้น</div>`:""}
+      ${plHtml}
+    </div>${alerts}<div class="mini" style="display:none"></div>`;
+
+  el.querySelector('[data-act="del"]').onclick=()=>{
+    if(!confirm("ลบ "+it.tk+" ?"))return;
+    saveItems(loadItems().filter(x=>x.id!==it.id));render();};
+  el.querySelector('[data-act="edit"]').onclick=()=>{
+    setMode(it.type);editId=it.id;
+    $("f_ticker").value=it.tk;$("f_entry").value=it.entry;
+    $("f_qty").value=it.qty??"";$("f_stop").value=it.stop??"";
+    $("f_target").value=it.target??"";$("f_cur").value=it.cur??"";$("f_note").value=it.note||"";
+    $("btnSave").textContent="อัปเดตรายการ";$("btnCancel").style.display="";
+    window.scrollTo({top:0,behavior:"smooth"});};
+  const mh=el.querySelector(".mini");
+  el.querySelector('[data-act="chart"]').onclick=()=>{
+    if(mh.style.display==="none"){mh.style.display="";if(!mh.dataset.done){miniChart(mh,it.tk);mh.dataset.done="1";}}
+    else mh.style.display="none";};
+  return el;
+}
+
+function render(){
+  const items=loadItems();
+  const b=items.filter(x=>x.type==="buy"),w=items.filter(x=>x.type==="watch");
+  const lb=$("listBuy"),lw=$("listWatch");
+  lb.innerHTML="";lw.innerHTML="";
+  b.forEach(it=>lb.appendChild(cardFor(it)));
+  w.forEach(it=>lw.appendChild(cardFor(it)));
+  $("emptyBuy").style.display=b.length?"none":"block";
+  $("emptyWatch").style.display=w.length?"none":"block";
+  $("cntBuy").textContent=b.length?`(${b.length})`:"";
+  $("cntWatch").textContent=w.length?`(${w.length})`:"";
+}
+setMode("buy");render();
+</script>
+</body>
+</html>
